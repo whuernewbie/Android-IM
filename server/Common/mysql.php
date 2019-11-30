@@ -1,12 +1,16 @@
 <?php
 
 namespace Common;
-
+/*
+ * Mysql 辅助 产生 数据库实例
+ * 不使用单例模式
+ */
 class Mysql {
     private static $config;
 
     private $pdo = null;
 
+	// 初始化数据库配置文件
     public static function init() {
         self::$config = require_once __DIR__ . '/mysql.config.php';
     }

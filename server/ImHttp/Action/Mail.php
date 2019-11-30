@@ -9,11 +9,33 @@ use PHPMailer\PHPMailer\Exception;
 
 require_once __DIR__ . '/mail/vendor/autoload.php';
 
+/*
+ * Mail 供其他接口使用
+ * 直接以子进程方式调用
+ * 协程会自动避免 io
+ *
+ */
+
 class Mail
 {
-    private const mail = '2339738942@qq.com';
+	/*
+	 * 发送者邮箱
+	 */
+    private const mail = '';
+
+	/*
+	 * 接受者邮箱
+	 */
     private $tomail;
+
+	/*
+	 * mail 对象
+	 */
     private $mailer;
+
+	/*
+	 * 验证码
+	 */
     private $auth;
 
     public function __construct($tomail, $auth)
@@ -32,14 +54,14 @@ class Mail
             $this->mailer->Host       = 'smtp.qq.com';                // SMTP服务器
             $this->mailer->SMTPAuth   = true;                      // 允许 SMTP 认证
             $this->mailer->Username   = self::mail;                // SMTP 用户名  即邮箱的用户名
-            $this->mailer->Password   = 'fctethnstdnpdjhg';             // SMTP 密码  部分邮箱是授权码(例如163邮箱)
+            $this->mailer->Password   = '';             // SMTP 密码  部分邮箱是授权码(例如163邮箱)
             $this->mailer->SMTPSecure = 'ssl';                    // 允许 TLS 或者ssl协议
             $this->mailer->Port       = 465;                            // 服务器端口 25 或者465 具体要看邮箱服务器支持
 
             $this->mailer->setFrom(self::mail, 'TalkTalk');  //发件人
             $this->mailer->addAddress($this->tomail, $this->tomail);  // 收件人
 
-            $this->mailer->addReplyTo('2339738942@qq.com', 'info'); //回复的时候回复给哪个邮箱 建议和发件人一致
+            $this->mailer->addReplyTo(self::mail, 'info'); //回复的时候回复给哪个邮箱 建议和发件人一致
             $this->mailer->isHTML(true);
 
             $body = <<<EOF
@@ -57,7 +79,7 @@ EOF;
 }
 
 if ($argc !== 3) {
-    echo '参数错误';
+    echo '参数错误' . PHP_EOL;
 }
 else {
     (new Mail($argv[1], $argv[2]))->send();

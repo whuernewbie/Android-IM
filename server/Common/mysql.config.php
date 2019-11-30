@@ -10,8 +10,8 @@ namespace Common;
 return $mysql_config = [
     'host' => 'localhost',
     'port' => 3306,
-    'db'   => 'im',
-    'user' => 'root',
-    'pass' => 'root@mlover',
-	'sock' => '/var/lib/mysql/mysql.sock'
+    'db'   => '',				// 数据库名
+    'user' => '',				// 用户
+    'pass' => ''				// 密码
+	'sock' => '/var/lib/mysql/mysql.sock', 	// sock 位置 可以不设置 pdo 方式会自行使用 sock
 ];
