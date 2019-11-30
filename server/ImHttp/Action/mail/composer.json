@@ -1,0 +1,12 @@
+{
+    "name": "lenovo/phpmail",
+    "authors": [
+        {
+            "name": "zyt",
+            "email": "2339738942@qq.com"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^6.1"
+    }
+}
