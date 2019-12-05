@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSON;
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.adapter.MsgAdapter;
 import org.cheng.wsdemo.bean.Msgbean;
+import org.cheng.wsdemo.bean.UserInfo;
 import org.cheng.wsdemo.bean.WebSocketMessageBean;
 import org.cheng.wsdemo.enums.MESSAGETYPE;
 import org.cheng.wsdemo.service.WebSocketService;
@@ -38,11 +39,18 @@ public class MessageActivity extends AppCompatActivity {
 
     private Context mContext;
 
+    public static final String name="Name";
+
+    public static final String receiverId="Id";
+
+    public static final String receiverImage="Image";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inputmsg);
+        mContext=MessageActivity.this;
         initMsgs(); // 初始化消息数据
         inputText = (EditText) findViewById(R.id.input_text);
         send = (Button) findViewById(R.id.send);
@@ -69,6 +77,8 @@ public class MessageActivity extends AppCompatActivity {
                             webSocketMessageBean.setMessageType(MESSAGETYPE.USERCHAT);
                             //用户ID
                             webSocketMessageBean.setSendUserId(FakeDataUtil.SENDUSERID);
+                            //接收方Id
+                            webSocketMessageBean.setReceiverId(receiverId);
                             //发送文字
                             webSocketMessageBean.setMessage(sendText);
                             //转换成JSON并发送

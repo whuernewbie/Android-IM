@@ -8,6 +8,8 @@ public class WebSocketMessageBean {
     private String message;
     private String sendUserId;
     private String receiverId;
+    private String email;
+    private String password;
 
 
     public WebSocketMessageBean(){
