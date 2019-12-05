@@ -25,7 +25,7 @@ import org.cheng.wsdemo.util.NoticeUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MessageActivity extends AppCompatActivity {
+public class MessageActivity extends BaseActivity {
 
     private List<Msgbean> msgList = new ArrayList<Msgbean>();
 

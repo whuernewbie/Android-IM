@@ -1,6 +1,8 @@
 package org.cheng.wsdemo.bean;
 
-public class UserInfo {
+import org.litepal.crud.DataSupport;
+
+public class UserInfo extends DataSupport {
     //昵称
     private String name;
     //id

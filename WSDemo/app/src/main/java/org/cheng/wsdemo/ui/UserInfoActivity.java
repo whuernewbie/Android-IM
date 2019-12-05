@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide;
 
 import org.cheng.wsdemo.R;
 
-public class UserInfoActivity extends AppCompatActivity {
+public class UserInfoActivity extends BaseActivity {
 
     public static final String FRUIT_NAME = "fruit_name";
 

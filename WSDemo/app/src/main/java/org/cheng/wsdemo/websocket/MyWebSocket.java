@@ -82,15 +82,9 @@ public class MyWebSocket implements Runnable{
             }
             @Override
             public void onTextMessage(String payLoad){
-                /** payLoad - 接收到的信息 , 将其转成实体类 ， 方便业务处理**/
+                /** TODO payLoad - 接收到的信息 , 将其转成实体类 ， 方便业务处理**/
                 WebSocketMessageBean webSocketMessageBean = JSON.parseObject(payLoad , new TypeReference<WebSocketMessageBean>(){});
                 Log.i(TAG  , "接收到返回数据 : " + payLoad);
-                /**
-                 * 这部分写自己的业务逻辑
-                 *
-                 * 业务逻辑
-                 * */
-                Log.i(TAG  , "接收到返回数据 : " + webSocketMessageBean.getMessageType().toString().equals("USERCHAT"));
                 if(webSocketMessageBean.getMessageType().toString().equals("USERCHAT"))
                 {
 
