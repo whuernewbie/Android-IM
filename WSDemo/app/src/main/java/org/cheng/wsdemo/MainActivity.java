@@ -16,15 +16,16 @@ import org.cheng.wsdemo.bean.UserInfo;
 import org.cheng.wsdemo.bean.WebSocketMessageBean;
 import org.cheng.wsdemo.enums.MESSAGETYPE;
 import org.cheng.wsdemo.service.WebSocketService;
+import org.cheng.wsdemo.ui.BaseActivity;
+import org.cheng.wsdemo.ui.LoginActivity;
 import org.cheng.wsdemo.ui.MessageActivity;
 import org.cheng.wsdemo.ui.MessagesActivity;
 import org.cheng.wsdemo.ui.UserInfoActivity;
-import org.cheng.wsdemo.ui.login.LoginActivity;
 
 import org.cheng.wsdemo.util.FakeDataUtil;
 import org.cheng.wsdemo.util.NoticeUtil;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     Context mContext;
 
     @Override
@@ -37,8 +38,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intentService = new Intent(mContext, WebSocketService.class);
         startService(intentService);
 
-        Intent intent1=new Intent(mContext, UserInfoActivity.class);
+        Intent intent1=new Intent(mContext, LoginActivity.class);
         startActivity(intent1);
+        finish();
 
     }
 

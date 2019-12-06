@@ -42,7 +42,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Type your Id here" />
+                android:hint="Type your vcode here" />
 
             <Button
                 android:id="@+id/sendEmail"
@@ -52,11 +52,51 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:textSize="18sp"
+                android:text="Your Password:" />
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:inputType="textPassword"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:textSize="18sp"
+                android:text="Configure Your Password:" />
+
+            <EditText
+                android:id="@+id/rpassword"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:inputType="textPassword"/>
+        </LinearLayout>
+
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Next"
-            android:id="@+id/step1_next"/>
+            android:text="Finish And Login"
+            android:id="@+id/finish"/>
 
 
     </LinearLayout>

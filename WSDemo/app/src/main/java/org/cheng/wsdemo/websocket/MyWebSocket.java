@@ -90,8 +90,6 @@ public class MyWebSocket implements Runnable{
 
                 }
 
-
-
             }
         };
     }
