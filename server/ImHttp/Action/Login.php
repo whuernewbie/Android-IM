@@ -13,27 +13,8 @@ use Common\Mysql;
  * * uid 用户 id
  * * password 用户密码
  */
-class Login implements Action
+class Login extends Action
 {
-    /**
-     * @var Gateway
-     */
-    private $gateway;
-
-    /**
-     * @var array http 请求头 post 数据
-     */
-    private $post;
-
-    /**
-     * Login constructor.
-     * @param Gateway $gateway
-     */
-    public function __construct(Gateway $gateway)
-    {
-        $this->gateway = $gateway;
-        $this->post = $this->gateway->req->post;
-    }
 
     public function run() {
         //:TODO 匹配用户名以及密码

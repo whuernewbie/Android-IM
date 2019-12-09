@@ -1,17 +1,37 @@
-#!/usr/bin/php
 <?php
 
-file_exists(__DIR__ . '/init.lock') and die('数据库已初始化，重现初始化请删除 lock 文件' . PHP_EOL);
+/**
+ * 文件说明
+ * 使用 .sql 文件 辅助创建数据库表
+ */
+
+/*
+ * mysql 方式
+ * *nix 系统中 主机 设为 localhost 则会使用 sock 通信 避免 tcp/ip
+ *  主机设为 127.0.0.1 则利用 tcp/ip 通信
+ * win 系统中 localhost 和 127.0.0.1 一样 都是 利用 tcp/ip
+ *
+ * * *nix 下建议 使用 sock 通信
+ */
+
+file_exists(__DIR__ . '/init.lock') and die('数据库已初始化，重新初始化请删除 lock 文件' . PHP_EOL);
 
 const HOST = 'localhost'; // win 下 使用 127.0.0.1 unix 下 使用 localhost 会使用 sock
 const PORT = 3306;
 const USER = 'root';
-const PASSWORD = 'root@mlover';
+const PASSWORD = 'root';
 const SOCK = '/var/lib/mysql/mysql.sock';
+const DB = 'ims';
 
-const DB = 'im';
+// 平台判断
 
-$mysql = new mysqli(HOST, USER, PASSWORD, null, PORT, SOCK) or die('mysql connect fail');
+if (':' === PATH_SEPARATOR) {   // linux 平台
+    $mysql = new mysqli(HOST, USER, PASSWORD, null, PORT, SOCK) or die('mysql connect fail');
+}
+else {                          // win 平台
+    $mysql = new mysqli(HOST, USER, PASSWORD) or die('mysql connect fail');
+}
+
 
 // 删除数据库 DB
 first:
@@ -26,10 +46,14 @@ $mysql->select_db(DB) or die ('选择数据库 error');
 
 $fp = fopen(__DIR__ . '/database.sql', 'r');
 
+/**
+ *  读取 sql 文件 获取语句并执行
+ */
 $str = '';
 while (!feof($fp)) {
     $line = fgets($fp);
-    $line = preg_replace('/\/\*.*\*\//', '', $line);
+    if ($line[0] === ';') break;                            // 终止符
+    $line = preg_replace('/\/\*.*\*\//', '', $line);        // 过滤注释
     $str .= $line;
 }
 
@@ -47,5 +71,6 @@ foreach ($sql as &$v) {
 }
 unset($v);
 
-touch(__DIR__ . '/init.lock');
+touch(__DIR__ . '/init.lock');      // 创建 lock 文件
+
 echo 'mysql database init ok' . PHP_EOL;

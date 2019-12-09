@@ -168,7 +168,7 @@ class SMTP
      *
      * @var int
      */
-    public $Timelimit = 300;
+    public $Timelimit = 3;
 
     /**
      * Patterns to extract an SMTP transaction id from reply to a DATA command.

@@ -2,7 +2,7 @@
 
 namespace Common;
 /*
- * Mysql 辅助 产生 数据库实例
+ * Mysql 辅助 产生 数据库连接实例
  * 不使用单例模式
  */
 class Mysql {
@@ -10,7 +10,7 @@ class Mysql {
 
     private $pdo = null;
 
-	// 初始化数据库配置文件
+    // 初始化数据库配置文件
     public static function init() {
         self::$config = require_once __DIR__ . '/mysql.config.php';
     }
@@ -21,11 +21,14 @@ class Mysql {
         try {
             $this->pdo = new \PDO($dsn, self::$config['user'], self::$config['pass']);
 
-            // 设置 异常 以及 fetch 方式为 索引数组
+            // 设置 fetch 方式为 索引数组
             $this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+            // 设置 pdo 错误为 抛出异常 便于调试
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            // 设置 数据库字段为小写
+            $this->pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
         } catch (\PDOException $e) {
-            echo 'pdo connect mysql fail ' . $e->getMessage();
+            echo 'pdo connect mysql fail ' . $e->getMessage() . PHP_EOL;
         }
 
     }

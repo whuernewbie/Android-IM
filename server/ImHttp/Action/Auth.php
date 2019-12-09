@@ -1,46 +1,37 @@
 <?php
 
+
 namespace ImHttp\Action;
 
 use Common\Mysql;
+use Tools\Sql;
 
 /**
  * Class Auth
  * @package ImHttp\Action
- * auth api 接口 用户注册认证
- * http     url?action=auth
- * api 所需参数
+ * auth api 接口 用户注册认证 | 用户重置密码
+ * http     url?action=auth&type=register | url?action=auth&type=reset
+ *
+ * type=register api 所需参数
  * * email      邮箱
  * * auth       验证码
  * * uname      用户名
  * * password   密码
+ *
+ * type=reset api 所需参数
+ * * email      邮箱
+ * * auth       验证码
+ * * password   新密码
  */
-class Auth implements Action
+class Auth extends Action
 {
-    /**
-     * @var Gateway 上层 网关 api
-     */
-    private $gateway;
+    private const REGISTER = 'register';
+    private const RESET    = 'reset';
 
     /**
-     * @var array http 请求头 post 数据
+     * 注册认证
      */
-    private $post;
-
-    /**
-     * Auth constructor.
-     * @param Gateway $gateway
-     */
-    public function __construct(Gateway $gateway)
-    {
-        $this->gateway = $gateway;
-        $this->post    = $this->gateway->req->post;
-    }
-
-    /**
-     * api 处理
-     */
-    public function run()
+    public function register_auth()
     {
 
         //:TODO 错误检测
@@ -77,10 +68,10 @@ class Auth implements Action
         $mysql = (new Mysql())->getInstance();
 
         // 防 sql 注入 简单 转义
-        $email    = $mysql->quote($this->post['email']);
+        $email = $mysql->quote($this->post['email']);
 
         auth_check:
-       $sql = 'select `auth` from `' . self::REGISTER_TABLE. '` where `email` = ' . $email;
+        $sql = 'select `auth` from `' . self::REGISTER_TABLE . '` where `email` = ' . $email;
 
         // 取出验证码
         $auth = $mysql->query($sql)->fetch();
@@ -89,29 +80,111 @@ class Auth implements Action
         if (false === $auth) {
             $this->gateway->notice(['status' => 'error', 'msg' => '不存在此邮箱']);
             return;
-        }
-        else {
+        } else {
             // 验证码 错误
             if ($auth['auth'] !== $this->post['auth']) {
                 $this->gateway->notice(['status' => 'error', 'msg' => '验证码错误']);
                 return;
-            }
-            else {
+            } else {
                 $sql = 'delete from `' . self::REGISTER_TABLE . '` where `email` = ' . $email;
                 $mysql->query($sql);
 
                 $uname    = $mysql->quote($this->post['uname']);
                 $password = $mysql->quote($this->post['password']);
-                $sql = "insert into `" . self::USER_TABLE . "` values (null, {$uname}, {$password}, {$email}, null,unix_timestamp(now()), null)";
+                $sql      = "insert into `" . self::USER_TABLE . "` values (null, {$uname}, {$password}, {$email}, null, null,unix_timestamp(now()), null)";
                 $mysql->query($sql);
 
-                $sql = 'select `uid` from `' . self::USER_TABLE .'` where `email` = ' . $email;
+                $sql = 'select `uid` from `' . self::USER_TABLE . '` where `email` = ' . $email;
                 $uid = $mysql->query($sql)->fetch()['uid'];
                 $this->gateway->notice(['status' => 'ok', 'uid' => $uid]);
             }
 
         }
+    }
 
+    /**
+     * 重置认证
+     */
+    public function reset_auth()
+    {
+        // 检查参数
+        check_argument:
+        // 用户 email
+        if (empty($this->post['email'])) {
+            $this->gateway->notice(['status' => 'error', 'msg' => 'no email']);
+            return;
+        }
+        // 验证码
+        if (empty($this->post['auth'])) {
+            $this->gateway->notice(['status' => 'error', 'msg' => 'no auth']);
+            return;
+        }
+        // 新密码
+        if (empty($this->post['password'])) {
+            $this->gateway->notice(['status' => 'error', 'msg' => 'no password']);
+            return;
+        }
+        echo $sql = (new Sql())->setTable(self::RESET_TABLE)
+                            ->select(['auth'])
+                            ->whereAnd(
+                                [
+                                    'email', '=', $this->post['email'],
+                                ]
+                            )
+                            ->getSql();
+        $mysql = (new Mysql())->getInstance();
+        $result = $mysql->query($sql)->fetchAll();
+
+        // 结果为空 1. 用户并没有进行密码重置 2. 验证码失效 被删除
+        if (empty($result)) {
+            $this->gateway->notice(['status' => 'error', 'msg' => '操作失败']);
+            return;
+        }
+        else {
+            if ($result[0]['auth'] !== $this->post['auth']) {
+                $this->gateway->notice(['status' => 'error', 'msg' => '验证码错误']);
+                return;
+            }
+            // 通过验证
+            else {
+
+                // 移除 重置表中的数据
+                $sql = (new Sql())->setTable(self::RESET_TABLE)
+                                ->delete()
+                                ->whereAnd(['email', '=', $this->post['email']])
+                                ->getSql();
+                $mysql->query($sql);
+                // 更新密码
+                $sql = (new Sql())->setTable(self::USER_TABLE)
+                                    ->update(['password' => $this->post['password']])
+                                    ->whereAnd(['email', '=', $this->post['email']])
+                                    ->getSql();
+                $mysql->query($sql);
+
+                $this->gateway->notice(['status' => 'ok', 'msg' => '密码修改成功']);
+            }
+        }
+    }
+
+    /**
+     * api 处理
+     */
+    public function run()
+    {
+        if (empty($this->get['type'])) {
+            $this->gateway->notice(['status' => 'error', 'msg' => 'no type']);
+            return;
+        }
+        switch ($this->get['type']) {
+            case self::REGISTER:
+                $this->register_auth();
+                break;
+            case self::RESET:
+                $this->reset_auth();
+                break;
+            default:
+                $this->gateway->notice(['status' => 'error', 'msg' => 'type error']);
+        }
     }
 
 }

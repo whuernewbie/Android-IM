@@ -13,11 +13,12 @@ use Swoole\Http\Request;
  * http api 服务网关
  * 根据 api 参数 选择对应服务
  */
-class Gateway
+class Gateway implements Api
 {
-    public const REGISTER = 'register';
-    public const AUTH = 'auth';
-    public const LOGIN = 'login';
+    /**
+     * @array api 服务 数组
+     */
+    private static $api = [];
     /**
      * @var Server
      */
@@ -33,15 +34,15 @@ class Gateway
 
     /**
      * Gateway constructor.
-     * @param Server $server    全局服务 master 进程 全局控制
-     * @param Request $req      http 请求体
-     * @param Response $res     http 响应体
+     * @param Server $server 全局服务 master 进程 全局控制
+     * @param Request $req http 请求体
+     * @param Response $res http 响应体
      */
     public function __construct(Server $server, Request $req, Response $res)
     {
         $this->server = $server;
-        $this->req = $req;
-        $this->res = $res;
+        $this->req    = $req;
+        $this->res    = $res;
     }
 
     /**
@@ -56,19 +57,13 @@ class Gateway
         }
         $action = $this->req->get['action'];
 
-        switch ($action) {
-            // 注册请求
-            case self::REGISTER:
-                (new Register($this))->run();
-                break;
-            case self::AUTH;
-                (new Auth($this))->run();
-                break;
-            case self::LOGIN:
-                (new Login($this))->run();
-                break;
-            default:
-                $this->notice(['status' => 'error', 'msg' => 'action error']);
+        // 找到对应 api 提供服务
+        if (in_array($action, self::$api, true)) {
+            $class_name = __NAMESPACE__ . '\\' . $action;
+            (new $class_name($this))->run();
+        }
+        else {
+            $this->notice(['status' => 'error', 'msg' => 'action error']);
         }
 
     }
@@ -77,9 +72,25 @@ class Gateway
      * @param array $msg 响应消息体
      * 回应 html 消息 json 格式输出
      */
-    public function notice(array $msg) {
+    public function notice(array $msg)
+    {
         $this->res->header('Content-Type', 'text/json;charset=utf-8');
         $msg = json_encode($msg);
         $this->res->end($msg);
+    }
+
+    /**
+     *  利用匿名对象 以及反射 实现枚举 常量读取
+     *  初始化 $api
+     */
+    public static function init() {
+        try {
+            self::$api = (new \ReflectionClass(
+                (new class() implements Api {})
+            ))->getConstants();
+        } catch (\Exception $e) {
+            echo $e->getMessage() . PHP_EOL;
+        }
+
     }
 }

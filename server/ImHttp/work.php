@@ -10,7 +10,7 @@ use Swoole\Http\Request;
 use Swoole\Http\Response;
 use ImHttp\Action;
 
-$server = new Server('0.0.0.0', 80);
+$server = new Server('0.0.0.0', 8899);
 
 /*
  * http server 设置
@@ -20,8 +20,8 @@ $server->set(
         'worker_num'            => 2,                   // worker 进程数量
         'task_worker_num'       => 1,                   // task  进程数量
         'task_enable_coroutine' => true,                // task 允许协程
-        'daemonize'             => 1,                   // 启用守护进程
-        'log_file'              => '/root/server/Log/http.log',    // 设置 log 文件
+//        'daemonize'             => 1,                   // 启用守护进程
+        'log_file'              => __DIR__ . '/../http.log',    // 设置 log 文件
     ]
 );
 
@@ -52,16 +52,16 @@ $server->on('request', function (Request $req, Response $res) use ($server) {
         return;
     }
 
-    // 交给 deal 处理
+    // 交给 Gateway 处理
     (new Action\Gateway($server, $req, $res))->run();
-//    $res->header('Content-Type', 'text/html');
-//    $res->end('<h3 align="center">server is running</h3>');
-////    $server->task('hello');
+//    $server->close($req->fd);
 });
 
 $server->on('close', function (Server $server, $fd, $reactor_id) {
     // do nothing
+    echo $fd . ' close' . PHP_EOL;
 });
+
 /*
  * master  start 回调
  * 设置 master 进程名

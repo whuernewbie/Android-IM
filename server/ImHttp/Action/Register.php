@@ -8,31 +8,12 @@ use Common\Mysql;
  * Class Register
  * @package ImHttp\Action
  */
-class Register implements Action
+class Register extends Action
 {
     /*
      *  验证码长度
      */
     public const AUTHSIZE = 6;
-
-    /**
-     * @var array 请求头 post 数据
-     */
-    private $post;
-    /**
-     * @var Gateway 上层网关 api
-     */
-    private $gateway;
-
-    /**
-     * Register constructor.
-     * @param Gateway $gateway
-     */
-    public function __construct(Gateway $gateway)
-    {
-        $this->gateway = $gateway;
-        $this->post = $this->gateway->req->post;
-    }
 
     /**
      *  生成验证信息插入注册表
@@ -68,16 +49,17 @@ class Register implements Action
         if (false !== $fetch) {
             $sql = 'update `' . self::REGISTER_TABLE . '` set `auth` = ' . $auth . ' where `email` = ' . $email;
             $mysql->exec($sql);
-            $this->gateway->notice(['status' => 'ok', 'msg' => '验证码已重发']);
         }
         else {      // 不在 register 表中 即第一次注册 插入数据即可
-            $sql = 'insert into `' . self::REGISTER_TABLE . "` values ({$email}, {$auth})";
+            $expire_time = time() + 5 * 60;
+            echo $sql = 'insert into `' . self::REGISTER_TABLE . "` values ({$email}, {$auth}, {$expire_time})";
             $mysql->exec($sql);
-            $this->gateway->notice(['status' => 'ok', 'msg' => '验证码已发送']);
         }
 
-        $mail_file = __DIR__ . '/Mail.php';
-        echo `php $mail_file $email $auth` . PHP_EOL;
+        $mail_path = Mail::PATH;
+        $type = Mail::REGISTER;
+        echo `php $mail_path $email $auth $type` . PHP_EOL;
+        $this->gateway->notice(['status' => 'ok', 'msg' => '验证码发送成功']);
     }
 
     /**
