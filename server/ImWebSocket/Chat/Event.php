@@ -3,15 +3,18 @@
 
 namespace ImWebSocket\Chat;
 
+use Common\Mysql;
+use Common\Redis;
 use Swoole\Http\Request;
 use \Swoole\WebSocket\Server as WebSocket;
 use \Swoole\WebSocket\Frame;
+use Tools\Sql;
 
 /**
  * Class Event
  * @package ImWebSocket\Chat
  */
-final class Event implements MessageType, MessageField
+final class Event implements MessageType, MessageField, WsMysql
 {
     private const GET_UID = 'uid';
     /**
@@ -25,15 +28,17 @@ final class Event implements MessageType, MessageField
     public static function init() {
         try {
             self::$message_type = (new \ReflectionClass(
-                (new class implements MessageType {})
-            ))->getConstants();
-        }
-        catch (\Exception $e) {
+                    (new class implements MessageType {})
+                ))
+                ->getConstants();
+
+        } catch (\Exception $e) {
             echo $e->getMessage() . PHP_EOL;
         }
     }
 
     /**
+     * 上线事件
      * @param WebSocket $ws
      * @param Request $req
      */
@@ -46,19 +51,26 @@ final class Event implements MessageType, MessageField
             return;
         }
         else {
-            (new Online($ws, $req));
+            $uid = $req->get[self::GET_UID];
+            (new Online($uid, $req->fd));
         }
     }
 
     /**
+     * 下线事件
      * @param WebSocket $ws
      * @param int $fd
      */
     public static function offline(WebSocket $ws, int $fd)
     {
-        (new Offline($ws, $fd));
+        (new Offline($fd));
     }
 
+    /**
+     * 在线消息事件
+     * @param WebSocket $ws
+     * @param Frame $frame
+     */
     public static function message(WebSocket $ws, Frame $frame) {
 
         $msg = json_decode($frame->data);
@@ -66,14 +78,15 @@ final class Event implements MessageType, MessageField
 
         // 不存在 对应 type
         if (!in_array($type, self::$message_type, true)) {
-            $ws->push($frame->fd,
+            $ws->push(
+                $frame->fd,
                 json_encode(['status' => 'error', 'msg' => 'no type'])
                 );
+
             return;
-        }
-        else {
+        } else {
             $class_name = __NAMESPACE__ . '\\' . $type;
-            (new $class_name($ws, $frame))->run();
+            (new $class_name($ws, $frame));
         }
     }
 }

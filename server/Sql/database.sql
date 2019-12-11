@@ -18,6 +18,18 @@ create table if not exists `user` (
 
 alter table `user` auto_increment = 1000000;
 
+/* 注册 管理员 */
+insert into `user` values (
+       1000000,
+       '客服',
+       'admin',
+       'admin@admin.com',
+       null,
+       null,
+       unix_timestamp(now()),
+       null
+);
+
 /* 用户注册表 */
 drop table if exists `register`;
 
@@ -86,8 +98,8 @@ create table if not exists `group_person` (
 
 ;;
 /* 群聊分表设计 */
-create table `group_gid` (
-   `mid` int primary key auto_increment COMMENT '消息 id, 自增',
-   `from_uid` int not null COMMENT '发送者 id',
+create table `groups_uid` (
+    `mid` int primary key auto_increment COMMENT '消息 id, 自增',
+    `from_uid` int not null COMMENT '发送者 id',
     `msg` text not null COMMENT '群聊消息'
 ) COMMENT = '群聊离线消息列表';

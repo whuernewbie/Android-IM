@@ -20,14 +20,16 @@ abstract class Chat
     /**
      * @var string json 消息体
      */
-    public $msg;
+    public $data;
 
     public function __construct(WebSocket $ws, Frame $frame)
     {
 
         $this->ws    = $ws;
         $this->frame = $frame;
-        $this->msg   = json_decode($this->frame->data);
+        $this->data  = $frame->data;
+
+        $this->run();
     }
 
     abstract public function run();

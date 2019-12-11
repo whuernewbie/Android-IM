@@ -13,7 +13,7 @@ use Swoole\Http\Request;
  * http api 服务网关
  * 根据 api 参数 选择对应服务
  */
-class Gateway implements Api
+class Gateway
 {
     /**
      * @array api 服务 数组

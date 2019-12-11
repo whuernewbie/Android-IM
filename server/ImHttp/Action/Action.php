@@ -38,6 +38,11 @@ abstract class Action
     const RESET_TABLE = 'found_lost';
 
     /**
+     * * 好友信息表
+     */
+    const FRIEND_TABLE = 'friend';
+
+    /**
      * Action constructor.
      * @param Gateway $gateway
      */
@@ -53,4 +58,5 @@ abstract class Action
      * action 动作
      */
     abstract public function run();
+
 }

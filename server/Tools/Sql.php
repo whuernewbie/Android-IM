@@ -46,11 +46,14 @@ class Sql
 
     /**
      * 返回生成的 sql 语句
+     * 执行后并清空 sql 便于对象 反复 利用
      * @return string
      */
     public function getSql()
     {
-        return $this->sql;
+        $sql = $this->sql;
+        $this->reset();
+        return $sql;
     }
 
     /**
@@ -233,7 +236,7 @@ class Sql
      */
     public function __toString()
     {
-        return $this->sql;
+        return $this->getSql();
     }
 
     /**
@@ -242,6 +245,6 @@ class Sql
      */
     public function __invoke()
     {
-        return $this->sql;
+        return $this->getSql();
     }
 }

@@ -21,8 +21,8 @@ $ws->set(
         'log_file'              => __DIR__ . '/../Log/ws.log',      // 设置 log 文件
         'websocket_subprotocol' => 'Talk Talk',                     // 设置子协议 （验证）
 
-        'heartbeat_check_interval' => 30,                           // 心跳检测 60秒关闭连接
-        'heartbeat_idle_time' => 60,
+//        'heartbeat_check_interval' => 30,                           // 心跳检测 60秒关闭连接
+//        'heartbeat_idle_time' => 60,
     ]
 );
 

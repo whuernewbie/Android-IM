@@ -2,38 +2,61 @@
 
 
 namespace ImWebSocket\Chat;
-use Swoole\WebSocket\Server as WebSocket;
 use Common\Redis;
 
-class Offline implements WsRedis
+class Offline
 {
-    /**
-     * @var WebSocket
-     */
-    private $ws;
     /**
      * @var int
      */
     private $fd;
+    /**
+     * @var \Redis
+     */
+    private $redis;
 
-    public function __construct(WebSocket $ws, int $fd)
+    public function __construct(int $fd)
     {
 
-        $this->ws = $ws;
         $this->fd = $fd;
         $this->run();
     }
 
     public function run() {
-        $redis = (new Redis())->getInstance();
-
-        $user = $redis->get(self::SOCKET_FD . $this->fd);
-
-        // 抑制错误 获取 uid 错误时 返回 null 不会影响后面处理
-        $uid = @explode(':', $user)[1];
-        $redis->unlink([self::SOCKET_FD . $this->fd, self::USER_PREFIX . $uid]);
-        echo 'close' . PHP_EOL;
 
         //TODO: redis 同步 mysql
+
+        $this->redis_clean();
+    }
+
+    private function redis_mysql() {
+
+    }
+
+    /**
+     * 清除用户在 redis 中的 信息
+     */
+    private function redis_clean() {
+        $redis = (new Redis())->getInstance();
+
+        // 获取 user 类似 user:1000000 作为键获取 hash 表
+        $user = $redis->get(WsRedis::SOCKET_FD . $this->fd);
+
+        $groups = $redis->hGetAll($user);
+
+        // 弹出第一项 fd:
+        array_shift($groups);
+        // 用户 id 从移除 群聊 set 中移除当前 uid
+        $uid = @explode(':', $user)[1];
+        foreach ($groups as  $k => $v) {
+            $redis->sRem($k, $uid);
+        }
+
+        /**
+         * 移除相关 key
+         * 1 -> fd:$fd
+         * 2 -> user:$uid
+         */
+        $redis->del(WsRedis::SOCKET_FD . $this->fd, $user);
     }
 }

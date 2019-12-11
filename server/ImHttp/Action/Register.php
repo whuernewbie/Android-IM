@@ -40,7 +40,7 @@ class Register extends Action
 
         // 检查 email 是否在 register 表中
         check_register_exist:
-        $auth = $mysql->quote($this->auth());       // 生成验证码
+        $auth = $mysql->quote(self::auth());       // 生成验证码
 
         $sql = 'select `email` from `' . self::REGISTER_TABLE . '` where `email` = ' . $email;
         $fetch = $mysql->query($sql)->fetch();
@@ -66,7 +66,7 @@ class Register extends Action
      * function 生成验证码
      * @return string
      */
-    private function auth() {
+    private static function auth() {
         $arr = array_pad([], self::AUTHSIZE, 0);
         array_walk($arr, function (&$v) {
             $v = mt_rand(0, 9);

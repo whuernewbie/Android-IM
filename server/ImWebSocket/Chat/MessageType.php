@@ -22,5 +22,5 @@ interface MessageType
     /**
      * 心跳
      */
-    const HEART_BEAT = 'beat';
+    const HEART_BEAT = 'Beat';
 }

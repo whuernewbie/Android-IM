@@ -25,7 +25,14 @@ use Tools\Sql;
  */
 class Auth extends Action
 {
+    /**
+     * 注册认证
+     */
     private const REGISTER = 'register';
+
+    /**
+     * 密码重置认证
+     */
     private const RESET    = 'reset';
 
     /**
@@ -33,9 +40,7 @@ class Auth extends Action
      */
     public function register_auth()
     {
-
-        //:TODO 错误检测
-        do_check: // 服务检测
+        do_check: // api 参数 检测
 
         // post 不存在 email 终止
         if (empty($this->post['email'])) {
@@ -61,44 +66,96 @@ class Auth extends Action
             return;
         }
 
-        //:TODO post 数据验证通过 认证验证码
-        check_ok:
+        check_auth: // 检测验证码
 
-        // 建立 数据库 连接
+        $email = $this->post['email']; // 邮箱
         $mysql = (new Mysql())->getInstance();
 
-        // 防 sql 注入 简单 转义
-        $email = $mysql->quote($this->post['email']);
+        $sql   = new Sql();
 
-        auth_check:
-        $sql = 'select `auth` from `' . self::REGISTER_TABLE . '` where `email` = ' . $email;
+        echo $query = $sql
+            ->setTable(self::REGISTER_TABLE)
+            ->select(['auth'])
+            ->whereAnd(['email', '=', $email])
+            ->getSql();
 
-        // 取出验证码
-        $auth = $mysql->query($sql)->fetch();
+        $result = $mysql->query($query)->fetch();
 
-        // 没有查到对应 邮箱 终止
-        if (false === $auth) {
+        // 结果为空 即 注册表中没有此邮箱信息
+        if (empty($result)) {
             $this->gateway->notice(['status' => 'error', 'msg' => '不存在此邮箱']);
+
             return;
         } else {
-            // 验证码 错误
-            if ($auth['auth'] !== $this->post['auth']) {
-                $this->gateway->notice(['status' => 'error', 'msg' => '验证码错误']);
+            $auth = $result['auth'];
+
+            // 对比 验证码
+            if ($auth === $this->post['auth']) {
+                // 移除 注册表中的信息
+                $sql->reset();
+                $query = $sql
+                        ->setTable(self::REGISTER_TABLE)
+                        ->delete()
+                        ->whereAnd(['email', '=', $email])
+                        ->getSql();
+
+                $mysql->exec($query);
+
+                // 插入用户信息
+                $sql->reset();
+                $query = $sql
+                    ->setTable(self::USER_TABLE)
+                    ->insert(
+                        [
+                            'uid'         => null,
+                            'uname'       => $this->post['uname'],
+                            'password'    => $this->post['password'],
+                            'email'       => $this->post['email'],
+                            'create_time' => 'unix_timestamp(now())',
+                        ]
+                    )
+                    ->getSql();
+
+                $mysql->exec($query);
+
+                /**
+                 * 拿回用户 id
+                 * 原因在于 多进程模式下，不能直接拿回 user 表的最大值
+                 */
+                $sql->reset();
+                $query = $sql->setTable(self::USER_TABLE)
+                        ->select(['uid'])
+                        ->whereAnd(['email', '=', $this->post['email']])
+                        ->getSql();
+
+                $result = $mysql->query($query)->fetch();
+                $uid = $result['uid'];
+
+                // 先响应 后台添加 客服
+                $this->gateway->notice(['status' => 'ok', 'uid' => $uid]);
+
+                // 添加 客服管理员
+                //TODO:: 客服 昵称以及 客服 id 设置
+                $sql->reset();
+                $query = $sql
+                        ->setTable(self::FRIEND_TABLE)
+                        ->insert(
+                            [
+                                'uid_1' => 1000000,
+                                'uid_2' => $uid,
+                            ]
+                        )
+                        ->getSql();
+
+                $mysql->exec($query);
+
                 return;
             } else {
-                $sql = 'delete from `' . self::REGISTER_TABLE . '` where `email` = ' . $email;
-                $mysql->query($sql);
 
-                $uname    = $mysql->quote($this->post['uname']);
-                $password = $mysql->quote($this->post['password']);
-                $sql      = "insert into `" . self::USER_TABLE . "` values (null, {$uname}, {$password}, {$email}, null, null,unix_timestamp(now()), null)";
-                $mysql->query($sql);
+                $this->gateway->notice(['status' => 'error', 'msg' => '验证码错误']);
 
-                $sql = 'select `uid` from `' . self::USER_TABLE . '` where `email` = ' . $email;
-                $uid = $mysql->query($sql)->fetch()['uid'];
-                $this->gateway->notice(['status' => 'ok', 'uid' => $uid]);
+                return;
             }
-
         }
     }
 
@@ -125,40 +182,39 @@ class Auth extends Action
             return;
         }
         echo $sql = (new Sql())->setTable(self::RESET_TABLE)
-                            ->select(['auth'])
-                            ->whereAnd(
-                                [
-                                    'email', '=', $this->post['email'],
-                                ]
-                            )
-                            ->getSql();
-        $mysql = (new Mysql())->getInstance();
+            ->select(['auth'])
+            ->whereAnd(
+                [
+                    'email', '=', $this->post['email'],
+                ]
+            )
+            ->getSql();
+        $mysql  = (new Mysql())->getInstance();
         $result = $mysql->query($sql)->fetchAll();
 
         // 结果为空 1. 用户并没有进行密码重置 2. 验证码失效 被删除
         if (empty($result)) {
             $this->gateway->notice(['status' => 'error', 'msg' => '操作失败']);
             return;
-        }
-        else {
+        } else {
             if ($result[0]['auth'] !== $this->post['auth']) {
                 $this->gateway->notice(['status' => 'error', 'msg' => '验证码错误']);
                 return;
-            }
-            // 通过验证
+            } // 通过验证
             else {
 
                 // 移除 重置表中的数据
-                $sql = (new Sql())->setTable(self::RESET_TABLE)
-                                ->delete()
-                                ->whereAnd(['email', '=', $this->post['email']])
-                                ->getSql();
+                $sql = (new Sql())
+                    ->setTable(self::RESET_TABLE)
+                    ->delete()
+                    ->whereAnd(['email', '=', $this->post['email']])
+                    ->getSql();
                 $mysql->query($sql);
                 // 更新密码
                 $sql = (new Sql())->setTable(self::USER_TABLE)
-                                    ->update(['password' => $this->post['password']])
-                                    ->whereAnd(['email', '=', $this->post['email']])
-                                    ->getSql();
+                    ->update(['password' => $this->post['password']])
+                    ->whereAnd(['email', '=', $this->post['email']])
+                    ->getSql();
                 $mysql->query($sql);
 
                 $this->gateway->notice(['status' => 'ok', 'msg' => '密码修改成功']);
