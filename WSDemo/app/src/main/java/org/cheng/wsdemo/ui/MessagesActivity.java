@@ -21,6 +21,11 @@ import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.adapter.MsgsAdapter;
 import org.cheng.wsdemo.bean.MsgUi;
 import org.cheng.wsdemo.bean.UserInfo;
+import org.cheng.wsdemo.enums.MESSAGETYPE;
+import org.cheng.wsdemo.websocket.MyWebSocket;
+import org.cheng.wsdemo.websocket.MyWebSocketHandler;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +46,57 @@ public class MessagesActivity extends BaseActivity {
     private MsgsAdapter adapter;
 
     private SwipeRefreshLayout swipeRefresh;
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        MyWebSocket.myWebSocketHandler=new MessagesActivity.MsgsHandler();
+    }
+
+    class MsgsHandler implements MyWebSocketHandler {
+        @Override
+        public void mySystemMethod(JSONObject jsonObject)
+        {
+            System.out.println(jsonObject.toString());
+            try
+            {
+                if(jsonObject.get("messageType").equals(MESSAGETYPE.USERCHAT.toString()))
+                {
+                    UserInfo userInfo=new UserInfo();
+                    userInfo.setName(" ");
+                    userInfo.setImageId(R.drawable.banana);
+                    userInfo.setId(jsonObject.get("sendUserId").toString());
+
+                    MsgUi msgUi=new MsgUi();
+                    msgUi.setUserInfo(userInfo);
+                    msgUi.setLastMsg(jsonObject.get("message").toString());
+
+                    boolean findIt=false;
+
+                    for (MsgUi msg:MsgList
+                         ) {
+                        if(msg.getUserInfo().getId().equals(userInfo.getId()))
+                        {
+                            msg.setLastMsg(jsonObject.get("message").toString());
+                            findIt=true;
+                            break;
+                        }
+
+                    }
+                    if(!findIt)
+                    {
+                        MsgList.add(msgUi);
+                    }
+                    adapter.notifyDataSetChanged();
+                }
+
+            }catch (JSONException e)
+            {
+                //TODO jse
+            }
+
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,12 +187,7 @@ public class MessagesActivity extends BaseActivity {
 
     //初始化消息列表
     private void initMessages() {
-        MsgList.clear();
-        for (int i = 0; i < 50; i++) {
-            Random random = new Random();
-            int index = random.nextInt(Msgs.length);
-            MsgList.add(Msgs[index]);
-        }
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

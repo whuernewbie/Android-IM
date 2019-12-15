@@ -75,7 +75,7 @@ public class LoginActivity extends BaseActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String account = accountEdit.getText().toString();
+                final String account = accountEdit.getText().toString();
                 String password = passwordEdit.getText().toString();
 
                 HttpUtil.postDataWithIdAndPsd(FakeDataUtil.LoginHttpAddress,account,password,new okhttp3.Callback(){
@@ -94,6 +94,7 @@ public class LoginActivity extends BaseActivity {
                                         //TODO 登陆成功
                                         Intent intent=new Intent(LoginActivity.this,MessagesActivity.class);
                                         startActivity(intent);
+                                        FakeDataUtil.SenderUid=account;
                                         finish();
                                     }
                                 });

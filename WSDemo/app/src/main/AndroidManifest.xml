@@ -11,7 +11,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.SignIn.SignFirstActivity"/>
+        <activity android:name=".ui.FindFriendsActivity"></activity>
+        <activity android:name=".ui.SignIn.SignFirstActivity" />
         <activity android:name=".ui.LoginActivity" />
         <activity android:name=".ui.BaseActivity" />
         <activity android:name=".ui.UserInfoActivity" />
@@ -27,7 +28,9 @@
 
         <service android:name=".service.WebSocketService" />
 
-        <uses-library android:required="false" android:name="com.google.android.things" />
+        <uses-library
+            android:name="com.google.android.things"
+            android:required="false" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

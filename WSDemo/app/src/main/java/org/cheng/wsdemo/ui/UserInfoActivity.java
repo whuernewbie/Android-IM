@@ -16,17 +16,28 @@ import org.cheng.wsdemo.R;
 
 public class UserInfoActivity extends BaseActivity {
 
-    public static final String FRUIT_NAME = "fruit_name";
+    public static final String NAME = "fruit_name";
 
-    public static final String FRUIT_IMAGE_ID = "fruit_image_id";
+    public static final String ID="100000";
+
+    public static final String IMAGE_ID = "fruit_image_id";
+
+    public String name;
+
+    public String Id;
+
+    int ImageId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userinfo);
+
         Intent intent = getIntent();
-        String fruitName = intent.getStringExtra(FRUIT_NAME);
-        int fruitImageId = intent.getIntExtra(FRUIT_IMAGE_ID, 0);
+        name = intent.getStringExtra(NAME);
+        ImageId = intent.getIntExtra(IMAGE_ID, 0);
+        Id=intent.getStringExtra(ID);
+
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -38,9 +49,9 @@ public class UserInfoActivity extends BaseActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        collapsingToolbar.setTitle(fruitName);
-        Glide.with(this).load(fruitImageId).into(fruitImageView);
-        String fruitContent = generateFruitContent(fruitName);
+        collapsingToolbar.setTitle(name);
+        Glide.with(this).load(ImageId).into(fruitImageView);
+        String fruitContent = generateFruitContent(name);
         fruitContentText.setText(fruitContent);
     }
 

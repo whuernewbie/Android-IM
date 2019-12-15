@@ -38,7 +38,7 @@ public class MainActivity extends BaseActivity {
         Intent intentService = new Intent(mContext, WebSocketService.class);
         startService(intentService);
 
-        Intent intent1=new Intent(mContext, LoginActivity.class);
+        Intent intent1=new Intent(mContext, MessagesActivity.class);
         startActivity(intent1);
         finish();
 
