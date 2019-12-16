@@ -59,7 +59,7 @@ public class MsgsAdapter extends RecyclerView.Adapter<MsgsAdapter.ViewHolder> {
                 MsgUi MsgUi = mMsgsList.get(position);
                 Intent intent = new Intent(mContext, MessageActivity.class);
                 intent.putExtra(MessageActivity.name, MsgUi.getUserInfo().getName());
-                intent.putExtra(MessageActivity.receiverId, MsgUi.getUserInfo().getId());
+                intent.putExtra(MessageActivity.receiverId, MsgUi.getUserInfo().getUid());
                 intent.putExtra(MessageActivity.receiverImage, MsgUi.getUserInfo().getImageId());
                 mContext.startActivity(intent);
             }

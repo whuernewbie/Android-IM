@@ -60,7 +60,7 @@ public class MessagesActivity extends BaseActivity {
                     UserInfo userInfo=new UserInfo();
                     userInfo.setName(" ");
                     userInfo.setImageId(R.drawable.banana);
-                    userInfo.setId(jsonObject.get("sendUserId").toString());
+                    userInfo.setUid(jsonObject.get("sendUserId").toString());
 
                     MsgUi msgUi=new MsgUi();
                     msgUi.setUserInfo(userInfo);
@@ -70,7 +70,7 @@ public class MessagesActivity extends BaseActivity {
 
                     for (MsgUi msg:MsgList
                          ) {
-                        if(msg.getUserInfo().getId().equals(userInfo.getId()))
+                        if(msg.getUserInfo().getUid().equals(userInfo.getUid()))
                         {
                             msg.setLastMsg(jsonObject.get("message").toString());
                             findIt=true;

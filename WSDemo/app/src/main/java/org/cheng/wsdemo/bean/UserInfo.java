@@ -6,11 +6,12 @@ public class UserInfo extends DataSupport {
     //昵称
     private String name;
     //id
-    private String id;
+    private String uid;
     //头像
     private int imageId;
     //邮箱
     private String email;
+
 
     public void UserInfo()
     {
@@ -19,11 +20,6 @@ public class UserInfo extends DataSupport {
 
     public void setName(String name){
         this.name=name;
-    }
-
-    public void setId(String Id)
-    {
-        this.id=Id;
     }
 
     public void setImageId(int imageId)
@@ -41,10 +37,6 @@ public class UserInfo extends DataSupport {
         return name;
     }
 
-    public String getId()
-    {
-        return id;
-    }
 
     public int getImageId()
     {
@@ -57,4 +49,11 @@ public class UserInfo extends DataSupport {
     }
 
 
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
 }
