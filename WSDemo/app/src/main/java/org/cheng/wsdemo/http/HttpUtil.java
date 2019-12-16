@@ -38,6 +38,18 @@ public class HttpUtil {
         client.newCall(request).enqueue(callback);
     }
 
+    public static  void postFindFrinds(final String address,String uid,final okhttp3.Callback callback)
+    {
+        OkHttpClient client = new OkHttpClient();//创建OkHttpClient对象。
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("uid",uid);//传递键值对参数
+        Request request = new Request.Builder()//创建Request 对象。
+                .url(address)
+                .post(formBody.build())//传递请求体
+                .build();
+        client.newCall(request).enqueue(callback);
+    }
+
     public static void postVcodeAndPsd(final String address,String email,String password,String vcode,final okhttp3.Callback callback){
         OkHttpClient client = new OkHttpClient();//创建OkHttpClient对象。
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体

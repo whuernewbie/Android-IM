@@ -65,11 +65,28 @@
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
-    <android.support.design.widget.FloatingActionButton
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_comment"
         app:layout_anchor="@id/appBar"
-        app:layout_anchorGravity="bottom|end" />
+        app:layout_anchorGravity="bottom|end"
+        >
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/AddFrinds"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_comment"
+            app:layout_anchor="@id/appBar"
+            app:layout_anchorGravity="bottom|end" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/SendMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_comment"
+            app:layout_anchor="@id/appBar"
+            app:layout_anchorGravity="bottom|end" />
+    </LinearLayout>
+
 </android.support.design.widget.CoordinatorLayout>

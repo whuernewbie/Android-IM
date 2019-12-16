@@ -16,9 +16,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import org.cheng.wsdemo.R;
+import org.cheng.wsdemo.adapter.FriendsAdapter;
 import org.cheng.wsdemo.adapter.MsgsAdapter;
 import org.cheng.wsdemo.bean.MsgUi;
 import org.cheng.wsdemo.bean.UserInfo;
@@ -30,78 +32,27 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-public class MessagesActivity extends BaseActivity {
+public class FriendsActivity extends BaseActivity {
 
     private DrawerLayout mDrawerLayout;
 
-    private List<MsgUi> MsgList = new ArrayList<>();
+    private List<UserInfo> FriendList = new ArrayList<>();
 
-    private MsgsAdapter adapter;
+    private FriendsAdapter adapter;
 
     private SwipeRefreshLayout swipeRefresh;
 
     @Override
-    protected void onResume(){
-        super.onResume();
-        MyWebSocket.myWebSocketHandler=new MessagesActivity.MsgsHandler();
-    }
-
-    class MsgsHandler implements MyWebSocketHandler {
-        @Override
-        public void mySystemMethod(JSONObject jsonObject)
-        {
-            System.out.println(jsonObject.toString());
-            try
-            {
-                if(jsonObject.get("messageType").equals(MESSAGETYPE.USERCHAT.toString()))
-                {
-                    UserInfo userInfo=new UserInfo();
-                    userInfo.setName(" ");
-                    userInfo.setImageId(R.drawable.banana);
-                    userInfo.setId(jsonObject.get("sendUserId").toString());
-
-                    MsgUi msgUi=new MsgUi();
-                    msgUi.setUserInfo(userInfo);
-                    msgUi.setLastMsg(jsonObject.get("message").toString());
-
-                    boolean findIt=false;
-
-                    for (MsgUi msg:MsgList
-                         ) {
-                        if(msg.getUserInfo().getId().equals(userInfo.getId()))
-                        {
-                            msg.setLastMsg(jsonObject.get("message").toString());
-                            findIt=true;
-                            break;
-                        }
-
-                    }
-                    if(!findIt)
-                    {
-                        MsgList.add(msgUi);
-                    }
-                    adapter.notifyDataSetChanged();
-                }
-
-            }catch (JSONException e)
-            {
-                //TODO jse
-            }
-
-        }
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_messages);
+        setContentView(R.layout.activity_friends);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
+
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -109,8 +60,8 @@ public class MessagesActivity extends BaseActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
 
-        //打开侧边菜单，默认点击call
-        navView.setCheckedItem(R.id.nav_msg);
+        //打开侧边菜单，默认点击friends
+        navView.setCheckedItem(R.id.nav_friends);
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -118,24 +69,24 @@ public class MessagesActivity extends BaseActivity {
                 {
                     case R.id.nav_msg:
                         mDrawerLayout.closeDrawers();
-                        break;
-                    case R.id.nav_friends:
-                        mDrawerLayout.closeDrawers();
-                        Intent intent=new Intent(MessagesActivity.this,FriendsActivity.class);
+                        Intent intent=new Intent(FriendsActivity.this,MessagesActivity.class);
                         startActivity(intent);
                         finish();
                         break;
+                    case R.id.nav_friends:
+                        mDrawerLayout.closeDrawers();
+                        break;
                     case R.id.nav_group:
                         mDrawerLayout.closeDrawers();
-                        Intent intent1=new Intent(MessagesActivity.this,GroupActivity.class);
+                        Intent intent1=new Intent(FriendsActivity.this,GroupActivity.class);
                         startActivity(intent1);
                         finish();
                         break;
                     case R.id.nav_dynamic:
-                        //TODO 动态页面
+                        //TODO 转动态
                         break;
                     case R.id.nav_Info:
-                        //TODO 个人信息界面
+                        //TODO 转个人信息
                         break;
                     case R.id.nav_view:
                         break;
@@ -149,36 +100,31 @@ public class MessagesActivity extends BaseActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Data deleted", Snackbar.LENGTH_SHORT)
-                        .setAction("Undo", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Toast.makeText(MessagesActivity.this, "Data restored", Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .show();
+               //TODO 圆形控件点击事件处理
             }
         });
 
 
         //初始化消息列表界面，下拉刷新
-        initMessages();
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        initFriends();
+        RecyclerView      recyclerView  = (RecyclerView) findViewById(R.id.recycler_view);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 1);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new MsgsAdapter(MsgList);
+
+        adapter = new FriendsAdapter(FriendList);
         recyclerView.setAdapter(adapter);
+
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshFruits();
+                refreshFriends();
             }
         });
     }
 
-    private void refreshFruits() {
+    private void refreshFriends() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -190,7 +136,7 @@ public class MessagesActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        initMessages();
+                        initFriends();
                         adapter.notifyDataSetChanged();
                         swipeRefresh.setRefreshing(false);
                     }
@@ -199,8 +145,9 @@ public class MessagesActivity extends BaseActivity {
         }).start();
     }
 
-    //初始化消息列表
-    private void initMessages() {
+    //初始化好友列表
+    private void initFriends() {
+        //TODO 初始化好友列表
 
     }
 

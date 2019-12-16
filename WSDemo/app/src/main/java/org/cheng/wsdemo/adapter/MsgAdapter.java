@@ -1,5 +1,7 @@
 package org.cheng.wsdemo.adapter;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,18 +11,27 @@ import android.widget.TextView;
 
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.bean.Msgbean;
+import org.cheng.wsdemo.ui.UserInfoActivity;
 
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
 
     private List<Msgbean> mMsgList;
+
+    private Context mContext;
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         LinearLayout leftLayout;
 
         LinearLayout rightLayout;
+
+        CircleImageView leftImage;
+
+        CircleImageView rightImage;
 
         TextView leftMsg;
 
@@ -32,6 +43,8 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
             rightLayout = (LinearLayout) view.findViewById(R.id.right_layout);
             leftMsg = (TextView) view.findViewById(R.id.left_msg);
             rightMsg = (TextView) view.findViewById(R.id.right_msg);
+            leftImage=(CircleImageView)view.findViewById(R.id.left_head_image);
+            rightImage=(CircleImageView)view.findViewById(R.id.right_head_image);
         }
     }
 
@@ -41,8 +54,27 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (mContext == null) {
+            mContext = parent.getContext();
+        }
+
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.msg_item, parent, false);
-        return new ViewHolder(view);
+        final MsgAdapter.ViewHolder holder = new MsgAdapter.ViewHolder(view);
+        holder.leftImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = holder.getAdapterPosition();
+                Msgbean msg=mMsgList.get(position);
+
+                Intent intent=new Intent(mContext, UserInfoActivity.class);
+                intent.putExtra(UserInfoActivity.NAME,msg.getName());
+                intent.putExtra(UserInfoActivity.IMAGE_ID,msg.getImage());
+                intent.putExtra(UserInfoActivity.ID,msg.getId());
+                mContext.startActivity(intent);
+            }
+        });
+
+        return holder;
     }
 
     @Override

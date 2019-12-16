@@ -1,6 +1,8 @@
 package org.cheng.wsdemo.ui;
 
 import android.content.Context;
+import android.content.Intent;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
@@ -21,9 +24,16 @@ import org.cheng.wsdemo.enums.MESSAGETYPE;
 import org.cheng.wsdemo.service.WebSocketService;
 import org.cheng.wsdemo.util.FakeDataUtil;
 import org.cheng.wsdemo.util.NoticeUtil;
+import org.cheng.wsdemo.websocket.MyWebSocket;
+import org.cheng.wsdemo.websocket.MyWebSocketHandler;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MessageActivity extends BaseActivity {
 
@@ -33,25 +43,77 @@ public class MessageActivity extends BaseActivity {
 
     private Button send;
 
+    private Button back;
+
+    private Button setInfo;
+
+    private ImageView leftImage;
+
+    private CircleImageView rightImage;
+
     private RecyclerView msgRecyclerView;
 
     private MsgAdapter adapter;
 
     private Context mContext;
 
-    public static final String name="Name";
+    private String rid;
 
-    public static final String receiverId="Id";
+    private String rname;
 
-    public static final String receiverImage="Image";
+    private String rImage;
 
+    public static final String name = "Name";
+
+    public static final String receiverId = "Id";
+
+    public static final String receiverImage = "Image";
+
+    //消息接受
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MyWebSocket.myWebSocketHandler = new LoginHandler();
+    }
+
+    class LoginHandler implements MyWebSocketHandler {
+        @Override
+        public void mySystemMethod(JSONObject jsonObject) {
+            System.out.println(jsonObject.toString());
+            try {
+                if (jsonObject.get("sendUserId").toString().equals(FakeDataUtil.SenderUid)) {
+                    Msgbean msg = new Msgbean(jsonObject.get("message").toString(), Msgbean.TYPE_RECEIVED);
+                    msg.setId(jsonObject.get("sendUserId").toString());
+                    msg.setName(jsonObject.get("sendUserId").toString());
+
+                    msgList.add(msg);
+                    adapter.notifyItemInserted(msgList.size() - 1); // 当有新消息时，刷新ListView中的显示
+                    msgRecyclerView.scrollToPosition(msgList.size() - 1); // 将ListView定位到最后一行
+                }
+
+            } catch (JSONException e) {
+                //TODO jse
+            }
+
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inputmsg);
-        mContext=MessageActivity.this;
+        mContext = MessageActivity.this;
+
+        Intent intent = getIntent();
+        rid = intent.getStringExtra(receiverId);
+        rname = intent.getStringExtra(name);
+        rImage = intent.getStringExtra(receiverImage);
+
+
         initMsgs(); // 初始化消息数据
+
+        back = (Button) findViewById(R.id.back);
+        setInfo = (Button) findViewById(R.id.InfoSet);
         inputText = (EditText) findViewById(R.id.input_text);
         send = (Button) findViewById(R.id.send);
         msgRecyclerView = (RecyclerView) findViewById(R.id.msg_recycler_view);
@@ -59,6 +121,15 @@ public class MessageActivity extends BaseActivity {
         msgRecyclerView.setLayoutManager(layoutManager);
         adapter = new MsgAdapter(msgList);
         msgRecyclerView.setAdapter(adapter);
+
+
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,9 +147,9 @@ public class MessageActivity extends BaseActivity {
                             //消息类型
                             webSocketMessageBean.setMessageType(MESSAGETYPE.USERCHAT);
                             //用户ID
-                            webSocketMessageBean.setSendUserId(FakeDataUtil.SENDUSERID);
+                            webSocketMessageBean.setSendUserId(FakeDataUtil.SenderUid);
                             //接收方Id
-                            webSocketMessageBean.setReceiverId(receiverId);
+                            webSocketMessageBean.setReceiverId(rid);
                             //发送文字
                             webSocketMessageBean.setMessage(sendText);
                             //转换成JSON并发送
@@ -105,17 +176,18 @@ public class MessageActivity extends BaseActivity {
     /*
         调用本方法控制view发送一个text消息
      */
-    public void receiveMsg(String stringMsg){
-        Msgbean msg=new Msgbean(stringMsg,Msgbean.TYPE_RECEIVED);
-        msgList.add(msg);
-    }
 
     private void initMsgs() {
-        Msgbean msg1 = new Msgbean("Hello guy.", Msgbean.TYPE_RECEIVED);
-        msgList.add(msg1);
-        Msgbean msg2 = new Msgbean("Hello. Who is that?", Msgbean.TYPE_SENT);
-        msgList.add(msg2);
-        Msgbean msg3 = new Msgbean("This is Tom. Nice talking to you. ", Msgbean.TYPE_RECEIVED);
-        msgList.add(msg3);
+        List<WebSocketMessageBean> webSocketMessageBeans = DataSupport.where("(sendUserId=? AND receiverId=?)or(sendUserId=? AND receiverId=?)", FakeDataUtil.SenderUid, rid, rid, FakeDataUtil.SenderUid).order("id asc").find(WebSocketMessageBean.class);
+        for (WebSocketMessageBean wb : webSocketMessageBeans
+        ) {
+            if (wb.getReceiverId().toString().equals(FakeDataUtil.SenderUid)) {
+                Msgbean msg1 = new Msgbean(wb.getMessage().toString(), Msgbean.TYPE_RECEIVED);
+                msgList.add(msg1);
+            } else if (wb.getReceiverId().toString().equals(rid)) {
+                Msgbean msg1 = new Msgbean(wb.getMessage().toString(), Msgbean.TYPE_SENT);
+                msgList.add(msg1);
+            }
+        }
     }
 }

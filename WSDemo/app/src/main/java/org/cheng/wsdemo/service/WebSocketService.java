@@ -2,7 +2,9 @@ package org.cheng.wsdemo.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 
 import org.cheng.wsdemo.websocket.MyWebSocket;
@@ -17,6 +19,8 @@ public class WebSocketService extends Service {
     public MyWebSocket myWebSocket;
 
 
+
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -27,5 +31,6 @@ public class WebSocketService extends Service {
         /** 建立连接 **/
         myWebSocket = new MyWebSocket();
         myWebSocket.run();
+
     }
 }

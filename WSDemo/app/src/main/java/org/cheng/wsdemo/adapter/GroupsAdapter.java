@@ -13,25 +13,24 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import org.cheng.wsdemo.R;
-import org.cheng.wsdemo.bean.MsgUi;
+import org.cheng.wsdemo.bean.GroupInfo;
+import org.cheng.wsdemo.bean.UserInfo;
 import org.cheng.wsdemo.ui.MessageActivity;
-import org.cheng.wsdemo.ui.MessagesActivity;
-import org.cheng.wsdemo.ui.UserInfoActivity;
 
 import java.util.List;
 
-public class MsgsAdapter extends RecyclerView.Adapter<MsgsAdapter.ViewHolder> {
+public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder> {
 
     private static final String TAG = "MsgAdapter";
 
     private Context mContext;
 
-    private List<MsgUi> mMsgsList;
+    private List<GroupInfo> mGroupList;
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        CardView cardView;
+        CardView  cardView;
         ImageView userImage;
-        TextView name;
+        TextView  name;
 
         public ViewHolder(View view) {
             super(view);
@@ -41,8 +40,8 @@ public class MsgsAdapter extends RecyclerView.Adapter<MsgsAdapter.ViewHolder> {
         }
     }
 
-    public MsgsAdapter(List<MsgUi> msgsList) {
-        mMsgsList = msgsList;
+    public GroupsAdapter(List<GroupInfo> groupInfos) {
+        mGroupList = groupInfos;
     }
 
     @Override
@@ -50,17 +49,17 @@ public class MsgsAdapter extends RecyclerView.Adapter<MsgsAdapter.ViewHolder> {
         if (mContext == null) {
             mContext = parent.getContext();
         }
-        View view = LayoutInflater.from(mContext).inflate(R.layout.msgs_item, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.friend_item, parent, false);
         final ViewHolder holder = new ViewHolder(view);
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int position = holder.getAdapterPosition();
-                MsgUi MsgUi = mMsgsList.get(position);
-                Intent intent = new Intent(mContext, MessageActivity.class);
-                intent.putExtra(MessageActivity.name, MsgUi.getUserInfo().getName());
-                intent.putExtra(MessageActivity.receiverId, MsgUi.getUserInfo().getId());
-                intent.putExtra(MessageActivity.receiverImage, MsgUi.getUserInfo().getImageId());
+                int      position = holder.getAdapterPosition();
+                GroupInfo groupInfo = mGroupList.get(position);
+                Intent   intent   = new Intent(mContext, MessageActivity.class);
+                intent.putExtra(MessageActivity.name, groupInfo.getName());
+                intent.putExtra(MessageActivity.receiverId, groupInfo.getGroupId());
+                intent.putExtra(MessageActivity.receiverImage, groupInfo.getGroupId());
                 mContext.startActivity(intent);
             }
         });
@@ -69,13 +68,13 @@ public class MsgsAdapter extends RecyclerView.Adapter<MsgsAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        MsgUi Msgui = mMsgsList.get(position);
-        holder.name.setText(Msgui.getUserInfo().getName());
-        Glide.with(mContext).load(Msgui.getUserInfo().getImageId()).into(holder.userImage);
+        GroupInfo groupInfo = mGroupList.get(position);
+        holder.name.setText(groupInfo.getName());
+        Glide.with(mContext).load(groupInfo.getHeadImageId()).into(holder.userImage);
     }
 
     @Override
     public int getItemCount() {
-        return mMsgsList.size();
+        return mGroupList.size();
     }
 }
