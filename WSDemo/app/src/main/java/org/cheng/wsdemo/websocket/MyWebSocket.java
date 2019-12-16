@@ -133,7 +133,7 @@ public class MyWebSocket implements Runnable{
     public static MyWebSocketHandler myWebSocketHandler=new MyWebSocketHandler() {
         @Override
         public void mySystemMethod(JSONObject jsonObject) {
-            //TODO
+            //TODO 消息转出方法
             }
     };
 

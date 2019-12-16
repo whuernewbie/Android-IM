@@ -8,5 +8,6 @@
         <mapping class="org.cheng.wsdemo.bean.UserInfo"></mapping>
         <mapping class="org.cheng.wsdemo.bean.WebSocketMessageBean"></mapping>
         <mapping class="org.cheng.wsdemo.bean.GroupInfo"></mapping>
+        <mapping class="org.cheng.wsdemo.bean.AddFriendsBean"></mapping>
     </list>
 </litepal>

@@ -17,6 +17,8 @@ import org.cheng.wsdemo.bean.WebSocketMessageBean;
 import org.cheng.wsdemo.enums.MESSAGETYPE;
 import org.cheng.wsdemo.service.WebSocketService;
 import org.cheng.wsdemo.ui.BaseActivity;
+import org.cheng.wsdemo.ui.FindFriendsActivity;
+import org.cheng.wsdemo.ui.FriendRequestActivity;
 import org.cheng.wsdemo.ui.LoginActivity;
 import org.cheng.wsdemo.ui.MessageActivity;
 import org.cheng.wsdemo.ui.MessagesActivity;

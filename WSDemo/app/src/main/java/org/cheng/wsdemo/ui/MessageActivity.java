@@ -2,6 +2,7 @@ package org.cheng.wsdemo.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,6 +28,7 @@ import org.cheng.wsdemo.websocket.MyWebSocket;
 import org.cheng.wsdemo.websocket.MyWebSocketHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,29 +63,26 @@ public class MessageActivity extends BaseActivity {
 
     private String rImage;
 
-    public static final String name="Name";
+    public static final String name = "Name";
 
-    public static final String receiverId="Id";
+    public static final String receiverId = "Id";
 
-    public static final String receiverImage="Image";
+    public static final String receiverImage = "Image";
 
     //消息接受
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
-        MyWebSocket.myWebSocketHandler=new LoginHandler();
+        MyWebSocket.myWebSocketHandler = new LoginHandler();
     }
 
     class LoginHandler implements MyWebSocketHandler {
         @Override
-        public void mySystemMethod(JSONObject jsonObject)
-        {
+        public void mySystemMethod(JSONObject jsonObject) {
             System.out.println(jsonObject.toString());
-            try
-            {
-                if(jsonObject.get("sendUserId").toString().equals(FakeDataUtil.SenderUid))
-                {
-                    Msgbean msg=new Msgbean(jsonObject.get("message").toString(),Msgbean.TYPE_RECEIVED);
+            try {
+                if (jsonObject.get("sendUserId").toString().equals(FakeDataUtil.SenderUid)) {
+                    Msgbean msg = new Msgbean(jsonObject.get("message").toString(), Msgbean.TYPE_RECEIVED);
                     msg.setId(jsonObject.get("sendUserId").toString());
                     msg.setName(jsonObject.get("sendUserId").toString());
 
@@ -92,8 +91,7 @@ public class MessageActivity extends BaseActivity {
                     msgRecyclerView.scrollToPosition(msgList.size() - 1); // 将ListView定位到最后一行
                 }
 
-            }catch (JSONException e)
-            {
+            } catch (JSONException e) {
                 //TODO jse
             }
 
@@ -104,19 +102,18 @@ public class MessageActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inputmsg);
-        mContext=MessageActivity.this;
+        mContext = MessageActivity.this;
 
-        Intent intent=new Intent();
-        rid=intent.getStringExtra(receiverId);
-        rname=intent.getStringExtra(name);
-        rImage=intent.getStringExtra(receiverImage);
-
+        Intent intent = getIntent();
+        rid = intent.getStringExtra(receiverId);
+        rname = intent.getStringExtra(name);
+        rImage = intent.getStringExtra(receiverImage);
 
 
         initMsgs(); // 初始化消息数据
 
-        back=(Button)findViewById(R.id.back);
-        setInfo=(Button)findViewById(R.id.InfoSet);
+        back = (Button) findViewById(R.id.back);
+        setInfo = (Button) findViewById(R.id.InfoSet);
         inputText = (EditText) findViewById(R.id.input_text);
         send = (Button) findViewById(R.id.send);
         msgRecyclerView = (RecyclerView) findViewById(R.id.msg_recycler_view);
@@ -181,11 +178,16 @@ public class MessageActivity extends BaseActivity {
      */
 
     private void initMsgs() {
-        Msgbean msg1 = new Msgbean("Hello guy.", Msgbean.TYPE_RECEIVED);
-        msgList.add(msg1);
-        Msgbean msg2 = new Msgbean("Hello. Who is that?", Msgbean.TYPE_SENT);
-        msgList.add(msg2);
-        Msgbean msg3 = new Msgbean("This is Tom. Nice talking to you. ", Msgbean.TYPE_RECEIVED);
-        msgList.add(msg3);
+        List<WebSocketMessageBean> webSocketMessageBeans = DataSupport.where("(sendUserId=? AND receiverId=?)or(sendUserId=? AND receiverId=?)", FakeDataUtil.SenderUid, rid, rid, FakeDataUtil.SenderUid).order("id asc").find(WebSocketMessageBean.class);
+        for (WebSocketMessageBean wb : webSocketMessageBeans
+        ) {
+            if (wb.getReceiverId().toString().equals(FakeDataUtil.SenderUid)) {
+                Msgbean msg1 = new Msgbean(wb.getMessage().toString(), Msgbean.TYPE_RECEIVED);
+                msgList.add(msg1);
+            } else if (wb.getReceiverId().toString().equals(rid)) {
+                Msgbean msg1 = new Msgbean(wb.getMessage().toString(), Msgbean.TYPE_SENT);
+                msgList.add(msg1);
+            }
+        }
     }
 }

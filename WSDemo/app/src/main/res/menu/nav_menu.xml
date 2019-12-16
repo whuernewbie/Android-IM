@@ -2,24 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_call"
-            android:icon="@drawable/nav_call"
-            android:title="Call" />
+            android:id="@+id/nav_msg"
+            android:icon="@drawable/msg_icon"
+            android:title="Message" />
         <item
             android:id="@+id/nav_friends"
-            android:icon="@drawable/nav_friends"
+            android:icon="@drawable/friends"
             android:title="Friends" />
         <item
-            android:id="@+id/nav_location"
-            android:icon="@drawable/nav_location"
-            android:title="Location" />
+            android:id="@+id/nav_group"
+            android:icon="@drawable/group"
+            android:title="Group" />
         <item
-            android:id="@+id/nav_mail"
-            android:icon="@drawable/nav_mail"
-            android:title="Mail" />
+            android:id="@+id/nav_dynamic"
+            android:icon="@drawable/dynamic"
+            android:title="Dynamic" />
         <item
-            android:id="@+id/nav_task"
-            android:icon="@drawable/nav_task"
-            android:title="Tasks" />
+            android:id="@+id/nav_Info"
+            android:icon="@drawable/info"
+            android:title="Info" />
     </group>
 </menu>

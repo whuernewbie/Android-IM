@@ -91,7 +91,6 @@ public class LoginActivity extends BaseActivity {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        //TODO 登陆成功
                                         Intent intent=new Intent(LoginActivity.this,MessagesActivity.class);
                                         startActivity(intent);
                                         FakeDataUtil.SenderUid=account;
@@ -137,14 +136,13 @@ public class LoginActivity extends BaseActivity {
                 Intent intent = new Intent(LoginActivity.this, SignFirstActivity.class);
                 startActivity(intent);
                 finish();
-                //TODO
             }
         });
 
         forgetPsd.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                //TODO
+                //TODO 处理忘记密码
             }
         });
     }
