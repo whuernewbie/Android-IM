@@ -7,7 +7,7 @@ namespace ImWebSocket\Chat;
 /**
  * Interface MessageType
  * 消息类型 实现 enum
- * @package ImWebSocket\Chat
+ * @package ImWebSocket\Message
  */
 interface MessageType
 {
@@ -19,6 +19,14 @@ interface MessageType
      * 群聊
      */
     const GROUP_CHAT = 'GroupChat';
+    /**
+     * 好友申请
+     */
+    const FRIEND_REQUEST = 'FriendReq';
+    /**
+     * 群聊申请
+     */
+    const GROUP_REQUEST = 'GroupReq';
     /**
      * 心跳
      */

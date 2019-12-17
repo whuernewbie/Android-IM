@@ -23,4 +23,12 @@ class File extends Action
         $this->gateway->res->header('Content-Type', 'image/jpg');
         $this->gateway->res->sendFile(self::FILE_PATH . '/image.jpg');
     }
+
+    /**
+     * check api 参数完整性
+     */
+    public function check()
+    {
+        // TODO: Implement check() method.
+    }
 }

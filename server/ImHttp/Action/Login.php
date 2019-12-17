@@ -4,6 +4,7 @@
 namespace ImHttp\Action;
 
 use Common\Mysql;
+use Tools\Sql;
 
 /**
  * Class Login
@@ -16,16 +17,21 @@ use Common\Mysql;
 class Login extends Action
 {
 
+    private const LOGIN_KEY = [
+        'uid',
+        'password',
+    ];
+
     public function run() {
-        //:TODO 匹配用户名以及密码
+
         check_post:
-        // 检测 post 数据包
-        if (empty($this->post['uid'])) {
-            $this->gateway->notice(['status' => 'error', 'msg' => 'login <- no uid']);
-            return;
-        }
-        if (empty($this->post['password'])) {
-            $this->gateway->notice(['status' => 'error', 'msg' => 'login <- no password']);
+
+        $ok = $this->check();
+
+        // 缺少参数
+        if (true !== $ok) {
+            $this->gateway->notice(['status' => 'error', 'msg' => 'no ' . $ok]);
+
             return;
         }
 
@@ -33,25 +39,52 @@ class Login extends Action
         // 验证用户名 密码
         $mysql = (new Mysql())->getInstance();
 
-        $uid = $mysql->quote($this->post['uid']);
-        $sql = 'select `uid`, `password` from `' . self::USER_TABLE . '` where `uid` = ' . $uid;
+        $sql = (new Sql())
+            ->setTable(HttpMysql::USER_TABLE)
+            ->select(
+                [
+                    'password',
+                ]
+            )
+            ->whereAnd(['uid', '=', $this->post['uid']])
+            ->getSql();
+
         $fetch = $mysql->query($sql)->fetch();
 
         // 没有对应的 uid 终止
         if (false === $fetch) {
             $this->gateway->notice(['status' => 'error', 'msg' => '用户不存在']);
+
             return;
         }
         else {
             $password = $fetch['password'];
             // 密码认证成功
             if ($password === $this->post['password']) {
+
                 $this->gateway->notice(['status' => 'ok', 'msg' => '认证成功']);
-            }
-            else {
-                $this->gateway->notice(['status' => 'error', 'msg' => '密码错误']);
+            } else {
+
+                $this->gateway->notice(['status' => 'error', 'msg' => '账号或密码错误']);
             }
         }
 
+    }
+
+    /**
+     * 检测参数
+     * 缺少参数则返回参数 key
+     * 通过返回 true
+     * @return bool|mixed
+     */
+    public function check()
+    {
+        foreach (self::LOGIN_KEY as $key) {
+            if (empty($this->post[$key])) {
+                return $key;
+            }
+        }
+
+        return true;
     }
 }
