@@ -27,6 +27,8 @@ import org.cheng.wsdemo.ui.UserInfoActivity;
 
 import org.cheng.wsdemo.util.FakeDataUtil;
 import org.cheng.wsdemo.util.NoticeUtil;
+import org.litepal.crud.DataSupport;
+import org.litepal.tablemanager.Connector;
 
 public class MainActivity extends BaseActivity {
     Context mContext;
@@ -37,11 +39,8 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         mContext = this;
 
-        //建立Websocket连接
-        Intent intentService = new Intent(mContext, WebSocketService.class);
-        startService(intentService);
 
-        Intent intent1=new Intent(mContext, CreatGroupActivity.class);
+        Intent intent1=new Intent(mContext, LoginActivity.class);
         startActivity(intent1);
         finish();
 

@@ -59,7 +59,7 @@ public class MsgsAdapter extends RecyclerView.Adapter<MsgsAdapter.ViewHolder> {
                 MsgUi MsgUi = mMsgsList.get(position);
                 Intent intent = new Intent(mContext, MessageActivity.class);
                 intent.putExtra(MessageActivity.name, MsgUi.getUserInfo().getName());
-                intent.putExtra(MessageActivity.receiverId, MsgUi.getUserInfo().getUid());
+                intent.putExtra(MessageActivity.msgTo, MsgUi.getUserInfo().getUid());
                 intent.putExtra(MessageActivity.receiverImage, MsgUi.getUserInfo().getImageId());
                 mContext.startActivity(intent);
             }
@@ -69,9 +69,9 @@ public class MsgsAdapter extends RecyclerView.Adapter<MsgsAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        MsgUi Msgui = mMsgsList.get(position);
-        holder.name.setText(Msgui.getUserInfo().getName());
-        Glide.with(mContext).load(Msgui.getUserInfo().getImageId()).into(holder.userImage);
+        MsgUi MsgUi = mMsgsList.get(position);
+        holder.name.setText(MsgUi.getUserInfo().getName());
+        Glide.with(mContext).load(MsgUi.getUserInfo().getImageId()).into(holder.userImage);
     }
 
     @Override

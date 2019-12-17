@@ -57,7 +57,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHold
                 UserInfo  userInfo    = mFriendsList.get(position);
                 Intent intent   = new Intent(mContext, MessageActivity.class);
                 intent.putExtra(MessageActivity.name, userInfo.getName());
-                intent.putExtra(MessageActivity.receiverId, userInfo.getUid());
+                intent.putExtra(MessageActivity.msgTo, userInfo.getUid());
                 intent.putExtra(MessageActivity.receiverImage, userInfo.getImageId());
                 mContext.startActivity(intent);
             }

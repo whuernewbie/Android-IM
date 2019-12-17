@@ -11,7 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.CreatGroupActivity"></activity>
+        <uses-library android:name="org.apache.http.legacy" android:required="false" />
+        <activity android:name=".ui.InfoChangeActivity"></activity>
+        <activity android:name=".ui.CreatGroupActivity" />
         <activity android:name=".ui.GroupActivity" />
         <activity android:name=".ui.FriendsActivity" />
         <activity android:name=".ui.FriendRequestActivity" />
@@ -38,5 +40,6 @@
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 </manifest>

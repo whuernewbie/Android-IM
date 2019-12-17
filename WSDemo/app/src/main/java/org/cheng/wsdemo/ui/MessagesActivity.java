@@ -22,13 +22,18 @@ import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.adapter.MsgsAdapter;
 import org.cheng.wsdemo.bean.MsgUi;
 import org.cheng.wsdemo.bean.UserInfo;
+import org.cheng.wsdemo.bean.WebSocketMessageBean;
 import org.cheng.wsdemo.enums.MESSAGETYPE;
+import org.cheng.wsdemo.service.WebSocketService;
+import org.cheng.wsdemo.util.FakeDataUtil;
 import org.cheng.wsdemo.websocket.MyWebSocket;
 import org.cheng.wsdemo.websocket.MyWebSocketHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -55,12 +60,12 @@ public class MessagesActivity extends BaseActivity {
             System.out.println(jsonObject.toString());
             try
             {
-                if(jsonObject.get("messageType").equals(MESSAGETYPE.USERCHAT.toString()))
+                if(jsonObject.get("msgType").equals(MESSAGETYPE.USERCHAT.toString()))
                 {
                     UserInfo userInfo=new UserInfo();
                     userInfo.setName(" ");
                     userInfo.setImageId(R.drawable.banana);
-                    userInfo.setUid(jsonObject.get("sendUserId").toString());
+                    userInfo.setUid(jsonObject.get("msgFrom").toString());
 
                     MsgUi msgUi=new MsgUi();
                     msgUi.setUserInfo(userInfo);
@@ -87,7 +92,7 @@ public class MessagesActivity extends BaseActivity {
 
             }catch (JSONException e)
             {
-                //TODO jse
+                //TODO JSON格式转换错误
             }
 
         }
@@ -97,6 +102,9 @@ public class MessagesActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_messages);
+
+        Intent intentService = new Intent(MessagesActivity.this, WebSocketService.class);
+        startService(intentService);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -199,8 +207,18 @@ public class MessagesActivity extends BaseActivity {
         }).start();
     }
 
-    //初始化消息列表
+    //TODO 初始化消息列表,
     private void initMessages() {
+    //    List<WebSocketMessageBean> msgList= DataSupport.where("msgTo = ? or msgType= ?", FakeDataUtil.SenderUid,MESSAGETYPE.GROUPCHAT.toString()).find(WebSocketMessageBean.class);
+    //    for (WebSocketMessageBean msg:msgList
+     //        ) {
+      //      if(msg.getMsgType().equals(MESSAGETYPE.GROUPCHAT.toString()))
+      //      {
+
+      //      }
+
+     //   }
+
 
     }
 
@@ -216,13 +234,16 @@ public class MessagesActivity extends BaseActivity {
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.backup:
-                Toast.makeText(this, "You clicked Backup", Toast.LENGTH_SHORT).show();
+                Intent intent2=new Intent(this,FriendRequestActivity.class);
+                startActivity(intent2);
                 break;
-            case R.id.delete:
-                Toast.makeText(this, "You clicked Delete", Toast.LENGTH_SHORT).show();
+            case R.id.btn_create_group:
+                Intent intent=new Intent(this,CreatGroupActivity.class);
+                startActivity(intent);
                 break;
-            case R.id.settings:
-                Toast.makeText(this, "You clicked Settings", Toast.LENGTH_SHORT).show();
+            case R.id.btn_find:
+                Intent intent1=new Intent(this,FindFriendsActivity.class);
+                startActivity(intent1);
                 break;
             default:
         }

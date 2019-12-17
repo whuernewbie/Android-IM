@@ -39,7 +39,7 @@ public class AddFriendsAdapter extends RecyclerView.Adapter<AddFriendsAdapter.My
         AddFriendsBean data = list.get(position);
         holder.ivIcon.setBackgroundResource(R.drawable.icon);
         //TODO 判断发出还是接受
-        holder.tvUsername.setText(data.getFrom());
+        holder.tvUsername.setText(data.getMsgFrom());
         //holder.tvMessage.setText(data.getMessage());
 
         holder.itemView.setTag(position);

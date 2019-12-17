@@ -28,6 +28,8 @@ public class FindFriendsActivity extends AppCompatActivity {
 
     private Button find;
 
+    private Button back;
+
     private TextView findResult;
 
     private ClearEditText text;
@@ -35,6 +37,8 @@ public class FindFriendsActivity extends AppCompatActivity {
     private String Id="1000000";
 
     private String name=Id;
+
+    private boolean isFinded=false;
 
     public static final String senderId="senderId";
 
@@ -47,6 +51,7 @@ public class FindFriendsActivity extends AppCompatActivity {
         find=(Button)findViewById(R.id.FindFriends);
         text=(ClearEditText)findViewById(R.id.EditFindId);
         findResult=(TextView)findViewById(R.id.findResult);
+        back=(Button)findViewById(R.id.back);
 
         final Intent intent=getIntent();
         Id=intent.getStringExtra(senderId);
@@ -69,19 +74,23 @@ public class FindFriendsActivity extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         findResult.setText(text.getText());
+                                        isFinded=true;
+                                        Id=text.getText().toString();
+                                        //TODO 查找结果页面name暂定Id
+                                        name=Id;
                                         try
                                         {
                                             name=jsonObject.get("uname").toString();
                                         }catch (JSONException e)
                                         {
-                                            //TODO jse
+                                            //TODO 子线程JSON格式转换错误
                                         }
                                     }
                                 });
                             }
                         }catch (JSONException e)
                         {
-                            //TODO JSON转换错误
+                            //TODO 子线程JSON格式转换错误
                         }
                     }
                     @Override
@@ -93,13 +102,25 @@ public class FindFriendsActivity extends AppCompatActivity {
             }
         });
 
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         findResult.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent1=new Intent(FindFriendsActivity.this,UserInfoActivity.class);
-                intent1.putExtra(UserInfoActivity.ID,text.getText().toString());
-                intent1.putExtra(UserInfoActivity.NAME,name);
-                startActivity(intent1);
+                if(isFinded)
+                {
+                    Intent intent1=new Intent(FindFriendsActivity.this,UserInfoActivity.class);
+                    intent1.putExtra(UserInfoActivity.ID,Id);
+                    intent1.putExtra(UserInfoActivity.NAME,name);
+                    startActivity(intent1);
+
+                }
+
 
             }
         });

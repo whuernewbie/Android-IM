@@ -6,11 +6,20 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.alibaba.fastjson.JSON;
 
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.adapter.AddFriendsAdapter;
+import org.cheng.wsdemo.bean.FriendListBean;
 import org.cheng.wsdemo.bean.AddFriendsBean;
+import org.cheng.wsdemo.bean.UserInfo;
+import org.cheng.wsdemo.service.WebSocketService;
+import org.cheng.wsdemo.util.NoticeUtil;
+import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,12 +32,21 @@ public class FriendRequestActivity extends AppCompatActivity {
 
     private AddFriendsAdapter adapter;
 
+    private ImageView back;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_request);
         initView();
         initData();
+
+        back=(ImageView) findViewById(R.id.iv_back);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         rvRecyclerView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));//控制布局为LinearLayout或者是GridView或者是瀑布流布局
         //rv.setLayoutManager(new GridLayoutManager(this,2));//类似桌面拖拽排序的效果
@@ -66,7 +84,10 @@ public class FriendRequestActivity extends AppCompatActivity {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 //侧滑事件
-                addFriendsBeanList.remove(viewHolder.getAdapterPosition());
+                if(addFriendsBeanList.size()!=0)
+                {
+                    addFriendsBeanList.remove(viewHolder.getAdapterPosition());
+                }
                 adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
             }
 
@@ -85,10 +106,8 @@ public class FriendRequestActivity extends AppCompatActivity {
     }
     private void initData() {
         addFriendsBeanList = new ArrayList<>();
-
-        AddFriendsBean addFriendsBean=new AddFriendsBean();
-        addFriendsBean.setFrom("1000001");
-        addFriendsBeanList.add(addFriendsBean);
+        List<AddFriendsBean> addFriendsBeans= DataSupport.findAll(AddFriendsBean.class);
+        addFriendsBeanList.addAll(addFriendsBeans);
 
     }
 
@@ -100,12 +119,40 @@ public class FriendRequestActivity extends AppCompatActivity {
         @Override
         public void onItemClick(View v, AddFriendsAdapter.ViewName viewName, int position) {
             //viewName可以区分是item还是item内部控件
+            AddFriendsBean addFriendsBean=addFriendsBeanList.get(position);
             switch (v.getId()){
                 case R.id.btn_agree:
                     //TODO 处理好友请求
-                    Toast.makeText(FriendRequestActivity.this,"你点击了同意按钮"+(position+1),Toast.LENGTH_SHORT).show();
+                    if(WebSocketService.webSocketConnection.isConnected())
+                    {
+                        addFriendsBeanList.remove(addFriendsBean);
+                        AddFriendsBean addFriendsBean1;
+                        addFriendsBean1=addFriendsBean;
+                        addFriendsBean.delete();
+                        addFriendsBean1.setActionType("agree");
+                        WebSocketService.webSocketConnection.sendTextMessage(JSON.toJSONString(addFriendsBean));
+                        adapter.notifyDataSetChanged();
+                        //先存到用户信息表
+                        UserInfo userInfo =new UserInfo();
+                        userInfo.setName(addFriendsBean.getMsgFrom());
+                        userInfo.setUid(addFriendsBean.getMsgFrom());
+                        userInfo.save();
+
+                        //再在用户关系表中绑定用户关系
+                        FriendListBean friendListBean =new FriendListBean();
+                        friendListBean.setUid1(addFriendsBean.getMsgFrom());
+                        friendListBean.setUid2(addFriendsBean.getMsgTo());
+                        friendListBean.save();
+                        Toast.makeText(FriendRequestActivity.this,"你点击了同意按钮"+(position+1),Toast.LENGTH_SHORT).show();
+                    }else
+                    {
+                        //TODO 网络问题
+                    }
                     break;
                 case R.id.btn_refuse:
+                    addFriendsBeanList.remove(addFriendsBean);
+                    addFriendsBean.delete();
+                    adapter.notifyDataSetChanged();
                     Toast.makeText(FriendRequestActivity.this,"你点击了拒绝按钮"+(position+1),Toast.LENGTH_SHORT).show();
                     break;
                 default:

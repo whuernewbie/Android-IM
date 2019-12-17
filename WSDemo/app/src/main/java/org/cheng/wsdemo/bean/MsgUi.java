@@ -1,6 +1,8 @@
 package org.cheng.wsdemo.bean;
 
-public class MsgUi {
+import org.litepal.crud.DataSupport;
+
+public class MsgUi extends DataSupport {
     private UserInfo userInfo;
 
     private String lastMsg;

@@ -58,7 +58,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                 GroupInfo groupInfo = mGroupList.get(position);
                 Intent   intent   = new Intent(mContext, MessageActivity.class);
                 intent.putExtra(MessageActivity.name, groupInfo.getName());
-                intent.putExtra(MessageActivity.receiverId, groupInfo.getGroupId());
+                intent.putExtra(MessageActivity.msgTo, groupInfo.getGroupId());
                 intent.putExtra(MessageActivity.receiverImage, groupInfo.getGroupId());
                 mContext.startActivity(intent);
             }

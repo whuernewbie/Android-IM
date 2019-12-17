@@ -11,6 +11,8 @@ public class NoticeUtil {
     public static final String NO_CONNECT = "当前没有网络连接,正在重连!";
     public static final String NOT_ALLOWED_EMP = "不允许为空!";
     public static final String ADD_FRIENDS="添加好友请求已经发送！";
+    public static final String JSONE="内容接收或发送出现了一些小问题......";
+
 
     public static void ShowImportMsg(String string, final Context context)
     {

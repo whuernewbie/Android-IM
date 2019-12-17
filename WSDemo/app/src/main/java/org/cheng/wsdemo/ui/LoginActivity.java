@@ -15,8 +15,10 @@ import android.widget.Toast;
 
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.http.HttpUtil;
+import org.cheng.wsdemo.service.WebSocketService;
 import org.cheng.wsdemo.ui.SignIn.SignFirstActivity;
 import org.cheng.wsdemo.util.FakeDataUtil;
+import org.cheng.wsdemo.util.WebSocketUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,9 +45,12 @@ public class LoginActivity extends BaseActivity {
 
     private CheckBox rememberPass;
 
-    public static String uid="";
+    private String uid="";
+    private String psd="";
 
-    public static String psd="";
+    public static String userId="";
+
+    public static String userPsd="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +64,12 @@ public class LoginActivity extends BaseActivity {
         Signin =(Button)findViewById(R.id.signin);
         forgetPsd= (TextView)findViewById(R.id.forget_psd);
 
+        Intent intent=getIntent();
+        uid=intent.getStringExtra(userId);
+        psd=intent.getStringExtra(userPsd);
+
         accountEdit.setText(uid);
-        accountEdit.setText(psd);
+        passwordEdit.setText(psd);
 
         boolean isRemember = pref.getBoolean("remember_password", false);
         if (isRemember) {
@@ -76,7 +85,7 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 final String account = accountEdit.getText().toString();
-                String password = passwordEdit.getText().toString();
+                final String password = passwordEdit.getText().toString();
 
                 HttpUtil.postDataWithIdAndPsd(FakeDataUtil.LoginHttpAddress,account,password,new okhttp3.Callback(){
                     @Override
@@ -88,45 +97,39 @@ public class LoginActivity extends BaseActivity {
                             System.out.println("成功成功成功"+jsonObject.get("status").toString());
                             if(jsonObject.get("status").toString().equals("ok"))
                             {
+
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        editor = pref.edit();
+                                        if (rememberPass.isChecked()) { // 检查复选框是否被选中
+                                            editor.putBoolean("remember_password", true);
+                                            editor.putString("account", account);
+                                            editor.putString("password", password);
+                                        } else {
+                                            editor.clear();
+                                        }
+                                        editor.apply();
+                                        FakeDataUtil.SenderUid=account;
+                                        WebSocketUtil.ROOT_URL=WebSocketUtil.ROOT_URL+account;
                                         Intent intent=new Intent(LoginActivity.this,MessagesActivity.class);
                                         startActivity(intent);
-                                        FakeDataUtil.SenderUid=account;
+                                        //建立Websocket连接
                                         finish();
                                     }
                                 });
                             }
                         }catch (JSONException e)
                         {
-                            //TODO JSON转换错误
+                            //TODO 子线程JSON格式转换错误
                         }
                     }
                     @Override
                     public void onFailure(Call call,IOException e){
-
+                        //TODO 子线程http传输错误
                     }
 
                 });
-                // 如果账号是admin且密码是123456，就认为登录成功
-                if (account.equals("admin") && password.equals("123456")) {
-                    editor = pref.edit();
-                    if (rememberPass.isChecked()) { // 检查复选框是否被选中
-                        editor.putBoolean("remember_password", true);
-                        editor.putString("account", account);
-                        editor.putString("password", password);
-                    } else {
-                        editor.clear();
-                    }
-                    editor.apply();
-                    Intent intent = new Intent(LoginActivity.this, MessagesActivity.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Toast.makeText(LoginActivity.this, "account or password is invalid",
-                            Toast.LENGTH_SHORT).show();
-                }
             }
         });
 

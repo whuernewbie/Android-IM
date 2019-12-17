@@ -7,13 +7,13 @@
         android:title="Backup"
         app:showAsAction="always"/>
     <item
-        android:id="@+id/delete"
-        android:icon="@drawable/ic_delete"
-        android:title="Delete"
-        app:showAsAction="ifRoom"/>
+        android:id="@+id/btn_create_group"
+        android:icon="@drawable/create_group"
+        android:title="createGroup"
+        app:showAsAction="always"/>
     <item
-        android:id="@+id/settings"
-        android:icon="@drawable/ic_settings"
-        android:title="Settings"
-        app:showAsAction="never"/>
+        android:id="@+id/btn_find"
+        android:icon="@drawable/addfriends"
+        android:title="Find"
+        app:showAsAction="always"/>
 </menu>

@@ -151,13 +151,16 @@ public class GroupActivity extends BaseActivity {
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.backup:
-                Toast.makeText(this, "You clicked Backup", Toast.LENGTH_SHORT).show();
+                Intent intent2=new Intent(this,FriendRequestActivity.class);
+                startActivity(intent2);
                 break;
-            case R.id.delete:
-                Toast.makeText(this, "You clicked Delete", Toast.LENGTH_SHORT).show();
+            case R.id.btn_create_group:
+                Intent intent=new Intent(this,CreatGroupActivity.class);
+                startActivity(intent);
                 break;
-            case R.id.settings:
-                Toast.makeText(this, "You clicked Settings", Toast.LENGTH_SHORT).show();
+            case R.id.btn_find:
+                Intent intent1=new Intent(this,FindFriendsActivity.class);
+                startActivity(intent1);
                 break;
             default:
         }

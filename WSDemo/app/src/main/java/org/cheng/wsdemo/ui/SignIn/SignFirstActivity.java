@@ -60,8 +60,8 @@ public class SignFirstActivity extends BaseActivity {
                     IsAllTrue=true;
                     uid=msg.obj.toString();
                     Intent intent=new Intent(mContext,LoginActivity.class);
-                    intent.putExtra(LoginActivity.uid,uid);
-                    intent.putExtra(LoginActivity.psd,password.getText().toString());
+                    intent.putExtra(LoginActivity.userId,uid);
+                    intent.putExtra(LoginActivity.userPsd,password.getText().toString());
                     startActivity(intent);
                     finish();
                     break;
@@ -109,7 +109,7 @@ public class SignFirstActivity extends BaseActivity {
                                     }
                                 }catch (JSONException e)
                                 {
-                                    //TODO JSON转换错误
+                                    //TODO 子线程JSON转换错误
                                 }
                             }
                             @Override
@@ -151,12 +151,12 @@ public class SignFirstActivity extends BaseActivity {
                             }
                         }catch (JSONException e)
                         {
-                            //TODO JSON转换错误
+                            //TODO 子线程JSON转换错误
                         }
                     }
                     @Override
                     public void onFailure(Call call,IOException e){
-                        //TODO
+                        //TODO 子线程http错误
                     }
                 });
             }

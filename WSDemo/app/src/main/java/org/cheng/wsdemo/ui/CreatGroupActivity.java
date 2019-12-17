@@ -87,12 +87,6 @@ public class CreatGroupActivity extends AppCompatActivity {
 
     private void initFriends(){
         //TODO 初始化好友列表
-        for(int i=0;i<=20;i++)
-        {
-            UserInfo userInfo=new UserInfo();
-            userInfo.setUid("1000001");
-            userInfo.setName("小明");
-            userInfoList.add(userInfo);
-        }
+
     }
 }

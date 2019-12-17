@@ -7,19 +7,18 @@ import java.util.Date;
 
 
 public class WebSocketMessageBean extends DataSupport {
-    private MESSAGETYPE messageType;
+    private MESSAGETYPE msgType;
     private String message;
-    private String sendUserId;
-    private String receiverId;
-    private Date date;
-    private String groupId;
+    private String msgFrom;
+    private String msgTo;
+    private Date   date;
 
-    public String getGroupId() {
-        return groupId;
+    public MESSAGETYPE getMsgType() {
+        return msgType;
     }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
+    public void setMsgType(MESSAGETYPE msgType) {
+        this.msgType = msgType;
     }
 
     public void setDate(Date date) {
@@ -33,14 +32,6 @@ public class WebSocketMessageBean extends DataSupport {
     public WebSocketMessageBean(){
     }
 
-    public MESSAGETYPE getMessageType() {
-        return messageType;
-    }
-
-    public void setMessageType(MESSAGETYPE messageType) {
-        this.messageType = messageType;
-    }
-
 
     public String getMessage() {
         return message;
@@ -50,32 +41,20 @@ public class WebSocketMessageBean extends DataSupport {
         this.message = message;
     }
 
-
-    public String getSendUserId() {
-        return sendUserId;
+    public String getMsgFrom() {
+        return msgFrom;
     }
 
-    public void setSendUserId(String sendUserId) {
-        this.sendUserId = sendUserId;
+    public void setMsgFrom(String msgFrom) {
+        this.msgFrom = msgFrom;
     }
 
-    public void setReceiverId(String receiverId) {
-        this.receiverId = receiverId;
+    public String getMsgTo() {
+        return msgTo;
     }
 
-    public String getReceiverId() {
-        return receiverId;
+    public void setMsgTo(String msgTo) {
+        this.msgTo = msgTo;
     }
 
-    @Override
-    public String toString() {
-        return "WebSocketMessageBean{" +
-                "messageType=" + messageType +
-                ", message='" + message + '\'' +
-                ", sendUserId='" + sendUserId + '\'' +
-                ", receiverId='"+receiverId+'\''+
-                ",groupId='"+groupId+'\''+
-                ",date='"+date+'\''+
-                '}';
-    }
 }

@@ -20,8 +20,9 @@ import org.cheng.wsdemo.bean.AddFriendsBean;
 import org.cheng.wsdemo.service.WebSocketService;
 import org.cheng.wsdemo.util.FakeDataUtil;
 import org.cheng.wsdemo.util.NoticeUtil;
+import org.w3c.dom.Text;
 
-public class UserInfoActivity extends BaseActivity {
+public class UserInfoActivity extends AppCompatActivity {
 
     public static final String NAME = "name";
 
@@ -32,6 +33,10 @@ public class UserInfoActivity extends BaseActivity {
     private FloatingActionButton AddFriends;
 
     private FloatingActionButton SendMsg;
+
+    private TextView content_text;
+
+    private ImageView imageView;
 
     private String name;
 
@@ -49,6 +54,9 @@ public class UserInfoActivity extends BaseActivity {
         ImageId = intent.getIntExtra(IMAGE_ID, 0);
         Id = intent.getStringExtra(ID);
 
+
+        imageView=(ImageView)findViewById(R.id.image_view);
+        content_text=(TextView)findViewById(R.id.content_text);
         AddFriends=(FloatingActionButton)findViewById(R.id.AddFrinds);
         SendMsg=(FloatingActionButton)findViewById(R.id.SendMsg);
 
@@ -58,13 +66,13 @@ public class UserInfoActivity extends BaseActivity {
                 if(WebSocketService.webSocketConnection.isConnected())
                 {
                     AddFriendsBean addFriendsBean = new AddFriendsBean();
-                    addFriendsBean.setTo(Id);
-                    addFriendsBean.setFrom(FakeDataUtil.SenderUid);
-                    addFriendsBean.setType("FriendReq");
+                    addFriendsBean.setMsgTo(Id);
+                    addFriendsBean.setMsgFrom(FakeDataUtil.SenderUid);
+                    addFriendsBean.setMsgType("FriendReq");
                     addFriendsBean.setActionType("request");
                     WebSocketService.webSocketConnection.sendTextMessage(JSON.toJSONString(addFriendsBean));
 
-                    NoticeUtil.ShowImportMsg(NoticeUtil.ADD_FRIENDS,UserInfoActivity.this);
+                    NoticeUtil.ShowImportMsg(JSON.toJSONString(addFriendsBean),UserInfoActivity.this);
                 }else
                 {
                     NoticeUtil.ShowImportMsg(NoticeUtil.NO_CONNECT,UserInfoActivity.this);
@@ -81,7 +89,7 @@ public class UserInfoActivity extends BaseActivity {
                 Intent intent = new Intent(UserInfoActivity.this, MessageActivity.class);
                 intent.putExtra(MessageActivity.receiverImage, ImageId);
                 intent.putExtra(MessageActivity.name, name);
-                intent.putExtra(MessageActivity.receiverId, ID);
+                intent.putExtra(MessageActivity.msgTo, ID);
                 startActivity(intent);
             }
         });
@@ -89,17 +97,18 @@ public class UserInfoActivity extends BaseActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        ImageView fruitImageView = (ImageView) findViewById(R.id.fruit_image_view);
-        TextView fruitContentText = (TextView) findViewById(R.id.fruit_content_text);
+
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
         collapsingToolbar.setTitle(name);
-        Glide.with(this).load(ImageId).into(fruitImageView);
+        Glide.with(this).load(ImageId).into(imageView);
+
         String fruitContent = generateFruitContent(name);
-        fruitContentText.setText(fruitContent);
+        content_text.setText(fruitContent);
     }
 
 

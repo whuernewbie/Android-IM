@@ -22,7 +22,7 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
-                android:id="@+id/fruit_image_view"
+                android:id="@+id/image_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
@@ -57,7 +57,7 @@
                 app:cardCornerRadius="4dp">
 
                 <TextView
-                    android:id="@+id/fruit_content_text"
+                    android:id="@+id/content_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp" />
