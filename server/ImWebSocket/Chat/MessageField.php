@@ -6,22 +6,22 @@ namespace ImWebSocket\Chat;
 
 /**
  * Interface MessageField
- * @package ImWebSocket\Chat
+ * @package ImWebSocket\Message
  */
 interface MessageField
 {
     /**
      * 消息类型 key
      */
-    const TYPE = 'type';
+    const TYPE = 'msgType';
     /**
      * 消息发送者 key
      */
-    const FROM = 'from';
+    const FROM = 'msgFrom';
     /**
      *  消息接受者 key
      */
-    const TO  = 'to';
+    const TO  = 'msgTo';
     /**
      *  消息内容 key
      */

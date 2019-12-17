@@ -24,25 +24,6 @@ abstract class Action
     protected $get;
 
     /**
-     * * 数据库 用户表名
-     */
-    const USER_TABLE = 'user';
-    /**
-     *  * 数据库 注册表名
-     */
-    const REGISTER_TABLE = 'register';
-
-    /**
-     * * 数据库 密码重置表
-     */
-    const RESET_TABLE = 'found_lost';
-
-    /**
-     * * 好友信息表
-     */
-    const FRIEND_TABLE = 'friend';
-
-    /**
      * Action constructor.
      * @param Gateway $gateway
      */
@@ -59,4 +40,8 @@ abstract class Action
      */
     abstract public function run();
 
+    /**
+     * check api 参数完整性
+     */
+    abstract public function check();
 }

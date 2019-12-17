@@ -3,18 +3,15 @@
 
 namespace ImWebSocket\Chat;
 
-use Common\Mysql;
-use Common\Redis;
 use Swoole\Http\Request;
 use \Swoole\WebSocket\Server as WebSocket;
 use \Swoole\WebSocket\Frame;
-use Tools\Sql;
 
 /**
  * Class Event
- * @package ImWebSocket\Chat
+ * @package ImWebSocket\Message
  */
-final class Event implements MessageType, MessageField, WsMysql
+final class Event
 {
     private const GET_UID = 'uid';
     /**
@@ -23,7 +20,7 @@ final class Event implements MessageType, MessageField, WsMysql
     private static $message_type;
 
     /**
-     * 初始化 message_type 消息类型
+     * 利用反射 初始化 message_type 消息类型
      */
     public static function init() {
         try {
@@ -31,6 +28,8 @@ final class Event implements MessageType, MessageField, WsMysql
                     (new class implements MessageType {})
                 ))
                 ->getConstants();
+
+            var_dump(self::$message_type);
 
         } catch (\Exception $e) {
             echo $e->getMessage() . PHP_EOL;
@@ -44,15 +43,15 @@ final class Event implements MessageType, MessageField, WsMysql
      */
     public static function online(WebSocket $ws, Request $req)
     {
-
         // url 中不含 uid 关闭连接
         if (empty($req->get[self::GET_UID])) {
+            $ws->push($req->fd, json_encode(['status' => 'error']));
             $ws->close($req->fd);
             return;
         }
         else {
             $uid = $req->get[self::GET_UID];
-            (new Online($uid, $req->fd));
+            (new Online($ws, $req, $uid));
         }
     }
 
@@ -76,16 +75,22 @@ final class Event implements MessageType, MessageField, WsMysql
         $msg = json_decode($frame->data);
         $type = @$msg->{MessageField::TYPE};
 
-        // 不存在 对应 type
+        if ('BEAT' === $msg->{'messageType'}) {
+            return;
+        }
+
+        // 不存在 对应 type 关闭连接
         if (!in_array($type, self::$message_type, true)) {
             $ws->push(
                 $frame->fd,
                 json_encode(['status' => 'error', 'msg' => 'no type'])
                 );
+            $ws->close($frame->fd);
 
             return;
         } else {
             $class_name = __NAMESPACE__ . '\\' . $type;
+
             (new $class_name($ws, $frame));
         }
     }

@@ -10,7 +10,12 @@ use Swoole\Http\Request;
 use Swoole\Http\Response;
 use ImHttp\Action;
 
-$server = new Server('0.0.0.0', 8899);
+const HOST = '0.0.0.0';
+const PORT = 8899;
+
+const TIMER = 1000 * 60;                            // 定时任务 1分钟一次
+
+$server = new Server(HOST, PORT);
 
 /*
  * http server 设置
@@ -21,7 +26,7 @@ $server->set(
         'task_worker_num'       => 1,                   // task  进程数量
         'task_enable_coroutine' => true,                // task 允许协程
 //        'daemonize'             => 1,                   // 启用守护进程
-        'log_file'              => __DIR__ . '/../http.log',    // 设置 log 文件
+        'log_file'              => __DIR__ . '/../Log/http.log',    // 设置 log 文件
     ]
 );
 
@@ -54,7 +59,7 @@ $server->on('request', function (Request $req, Response $res) use ($server) {
 
     // 交给 Gateway 处理
     (new Action\Gateway($server, $req, $res))->run();
-//    $server->close($req->fd);
+
 });
 
 $server->on('close', function (Server $server, $fd, $reactor_id) {
@@ -85,8 +90,14 @@ $server->on('workerStart', function (Server $server) {
     // 判断是否是 task 进程
     if ($server->taskworker) {
         cli_set_process_title('php http task ' . $server->worker_id);
+
     } else {
         cli_set_process_title('php http worker ' . $server->worker_id);
+
+        // 第一个 worker 进程执行定时任务
+        if ($server->worker_id === 0) {
+            $server->tick(TIMER, ['\ImHttp\Task', 'time']);
+        }
     }
 
 });
@@ -95,9 +106,7 @@ $server->on('workerStart', function (Server $server) {
  * task 回调 分发任务
  */
 $server->on('Task', function (Server $server, \Swoole\Server\Task $task) {
-    var_dump($task);
-    $back = `php -v`;
-    $task->finish($back);
+    \ImHttp\Task::run($task);
 });
 
 /*
@@ -105,6 +114,6 @@ $server->on('Task', function (Server $server, \Swoole\Server\Task $task) {
  * 可以不设置回调函数，则不处理 task 结果
  */
 $server->on('finish', function (Server $server, $task_id, $data) {
-    var_dump($task_id, $data);
+    // do nothing
 });
 

@@ -7,7 +7,7 @@ use Common\Mysql;
 use Common\Redis;
 use Tools\Sql;
 
-class SingleChat extends Chat
+class SingleChat extends Message
 {
     /**
      * 私聊处理
@@ -17,9 +17,8 @@ class SingleChat extends Chat
         $msg = json_decode($this->data);
 
         // 获取目标用户 检测在线状态
-        $to       = @$msg->{MessageField::TO};
-        $redis    = (new Redis())->getInstance();
-
+        $to     = @$msg->{MessageField::TO};
+        $redis  = (new Redis())->getInstance();
         $aim_fd = $redis->hGet(WsRedis::USER_PREFIX . $to, WsRedis::SOCKET_FD);
 
         // 存在则会返回 用户对应的 fd 否者返回 false
@@ -32,7 +31,10 @@ class SingleChat extends Chat
      */
     private function aimOnline(int $aim_fd)
     {
-        $this->ws->push($aim_fd, $this->data);
+        // 推送失败 进行离线处理 可能因为 用户意外掉线
+        if (!$this->ws->push($aim_fd, $this->data)) {
+            $this->aimOffline();
+        }
     }
 
     /**
@@ -53,9 +55,9 @@ class SingleChat extends Chat
             ->setTable(WsMysql::PRI_MSG)
             ->insert(
                 [
-                    'to_uid'   => $to,
-                    'from_uid' => $from,
-                    'msg'      => $this->data,
+                    'to_uid'   => $to,                  // 发送者
+                    'from_uid' => $from,                // 接收者
+                    'msg'      => $this->data,          // 消息
                 ]
             )
             ->getSql();

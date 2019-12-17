@@ -53,6 +53,7 @@ class Gateway
         // 非指定动作 不处理
         if (empty($this->req->get['action'])) {
             $this->notice(['status' => 'error', 'msg' => 'no action']);
+
             return;
         }
         $action = $this->req->get['action'];
@@ -63,6 +64,7 @@ class Gateway
             (new $class_name($this))->run();
         }
         else {
+
             $this->notice(['status' => 'error', 'msg' => 'action error']);
         }
 

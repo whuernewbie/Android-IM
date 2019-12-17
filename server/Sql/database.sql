@@ -12,6 +12,7 @@ create table if not exists `user` (
     `sex` tinyint default null COMMENT '性别',
     `age` tinyint default null COMMENT '年龄',
     `create_time` int not null COMMENT '创建时间',
+    `icon` varchar(128) default null COMMENT '头像',
     `more_info` text COMMENT '额外信息 json 格式保存',
     unique key (email) COMMENT 'email 唯一'
 ) COMMENT = '用户表';
@@ -27,6 +28,7 @@ insert into `user` values (
        null,
        null,
        unix_timestamp(now()),
+       null,
        null
 );
 
@@ -84,6 +86,9 @@ create table if not exists `group_info` (
     `person_number` int not null COMMENT '群人数'
 ) COMMENT = '群聊信息表';
 
+/* 设置群聊自增初值 */
+alter table `group_info` auto_increment = 1000;
+
 /* 群聊好友关系表 */
 drop table if exists `group_person`;
 
@@ -98,7 +103,7 @@ create table if not exists `group_person` (
 
 ;;
 /* 群聊分表设计 */
-create table `groups_uid` (
+create table `group_gid` (
     `mid` int primary key auto_increment COMMENT '消息 id, 自增',
     `from_uid` int not null COMMENT '发送者 id',
     `msg` text not null COMMENT '群聊消息'

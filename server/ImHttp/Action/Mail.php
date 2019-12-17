@@ -47,7 +47,7 @@ class Mail
             $this->mailer->setFrom(self::MAIL, 'Talk Talk');  //发件人
             $this->mailer->addAddress($this->tomail, $this->tomail);  // 收件人
 
-            $this->mailer->addReplyTo('2339738942@qq.com', 'info'); //回复的时候回复给哪个邮箱 建议和发件人一致
+            $this->mailer->addReplyTo('2339738942@qq.com', 'Talk Talk'); //回复的时候回复给哪个邮箱 建议和发件人一致
             $this->mailer->isHTML(true);
 
             $register = <<<EOF
@@ -58,28 +58,20 @@ EOF;
 EOF;
             if (self::REGISTER === $this->type) {
                 $body = $register;
-            } else if (self::RESET === $this->type) {
+            } elseif (self::RESET === $this->type) {
                 $body = $reset;
             } else {
-                echo self::ERROR;
-                return;
+                return self::ERROR;
             }
 
 
             $this->mailer->Subject = 'Talk Talk';
             $this->mailer->Body    = $body;
-            $this->mailer->AltBody = '您正在注册 Talk Talk 账号, 验证码为 ' . $this->auth . ' !';
+            $this->mailer->AltBody = '您正在进行重要操作，验证码为 ' . $this->auth . ' !';
             $this->mailer->send();
-            echo self::OK;
+            return self::OK;
         } catch (\Exception $e) {
-            echo self::ERROR;
+            return $e->getMessage();
         }
     }
-}
-
-if ($argc !== 4) {
-    echo '参数错误' . PHP_EOL;
-}
-else {
-    (new Mail($argv[1], $argv[2], $argv[3]))->send();
 }

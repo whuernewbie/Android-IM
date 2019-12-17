@@ -18,4 +18,6 @@ interface Api
     public const RESET    = 'reset';
     public const FILE     = 'file';
     public const UPDATE   = 'update';
+    public const UPLOAD   = 'upload';
+    public const CREATE_GROUP = 'creategroup';
 }

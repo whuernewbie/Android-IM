@@ -8,14 +8,17 @@ require_once __DIR__ . '/Chat/WsMysql.php';
 require_once __DIR__ . '/Chat/Event.php';
 require_once __DIR__ . '/Chat/Online.php';
 require_once __DIR__ . '/Chat/Offline.php';
-require_once __DIR__ . '/Chat/Chat.php';
+require_once __DIR__ . '/Chat/Message.php';
 require_once __DIR__ . '/Chat/SingleChat.php';
 require_once __DIR__ . '/Chat/GroupChat.php';
+require_once __DIR__ . '/Chat/FriendReq.php';
+require_once __DIR__ . '/Chat/GroupReq.php';
 
 require_once __DIR__ . '/../Common/Mysql.php';
 require_once __DIR__ . '/../Common/Redis.php';
 
 require_once __DIR__ . '/../Tools/Sql.php';
+require_once __DIR__ . '/../Log/Log.php';
 
 /**
  * 消息类型初始化

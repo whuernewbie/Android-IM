@@ -14,12 +14,12 @@ $ws = new WebSocket('0.0.0.0', 8080);
 
 $ws->set(
     [
-        'worker_num'            => 1,                               // worker 进程数量
+        'worker_num'            => 2,                               // worker 进程数量
 //        'task_worker_num'       => 1,                               // task  进程数量
-        'task_enable_coroutine' => true,                            // task 允许协程
+//        'task_enable_coroutine' => true,                            // task 允许协程
 //        'daemonize'             => 1,                               // 启用守护进程
         'log_file'              => __DIR__ . '/../Log/ws.log',      // 设置 log 文件
-        'websocket_subprotocol' => 'Talk Talk',                     // 设置子协议 （验证）
+//        'websocket_subprotocol' => 'Talk Talk',                     // 设置子协议 （验证）
 
 //        'heartbeat_check_interval' => 30,                           // 心跳检测 60秒关闭连接
 //        'heartbeat_idle_time' => 60,
@@ -40,9 +40,9 @@ $ws->on('open', function (WebSocket $server, Request $req){
  * 事件处理
  */
 $ws->on('message', function (WebSocket $server, \Swoole\WebSocket\Frame $frame) {
-    // TODO:: 消息处理
 
     Event::message($server, $frame);
+
 });
 
 /**
@@ -53,6 +53,7 @@ $ws->on('close', function (WebSocket $server, int $fd) {
 
     Event::offline($server, $fd);
 
+    echo 'close' . PHP_EOL;
 });
 
 

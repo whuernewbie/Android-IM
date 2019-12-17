@@ -11,11 +11,11 @@ namespace Tools;
 class Sql
 {
     /**
-     * mysql 数据库 内置的函数以及特殊值
+     * mysql 数据库 内置的函数以及特殊值 只限于 insert 不处理
      */
     private const INNER = [
-        null,
-        'unix_timestamp(now())',
+        null,                                   // null 值
+        'unix_timestamp(now())',                // 时间戳
     ];
     /**
      * @var string
