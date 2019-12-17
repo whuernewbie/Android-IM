@@ -7,7 +7,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,10 +18,7 @@ import android.widget.Toast;
 
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.adapter.GroupsAdapter;
-import org.cheng.wsdemo.adapter.MsgsAdapter;
-import org.cheng.wsdemo.bean.Friends;
 import org.cheng.wsdemo.bean.GroupInfo;
-import org.cheng.wsdemo.bean.MsgUi;
 
 import java.util.ArrayList;
 import java.util.List;

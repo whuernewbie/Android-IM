@@ -11,7 +11,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.GroupActivity"></activity>
+        <activity android:name=".ui.CreatGroupActivity"></activity>
+        <activity android:name=".ui.GroupActivity" />
         <activity android:name=".ui.FriendsActivity" />
         <activity android:name=".ui.FriendRequestActivity" />
         <activity android:name=".ui.FindFriendsActivity" />

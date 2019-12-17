@@ -11,6 +11,7 @@ public class GroupInfo extends DataSupport {
 
     private int headImageId;
 
+
     public String getGroupId() {
         return groupId;
     }

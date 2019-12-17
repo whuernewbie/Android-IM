@@ -13,8 +13,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import org.cheng.wsdemo.R;
-import org.cheng.wsdemo.bean.Friends;
-import org.cheng.wsdemo.bean.MsgUi;
 import org.cheng.wsdemo.bean.UserInfo;
 import org.cheng.wsdemo.ui.MessageActivity;
 
@@ -59,7 +57,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHold
                 UserInfo  userInfo    = mFriendsList.get(position);
                 Intent intent   = new Intent(mContext, MessageActivity.class);
                 intent.putExtra(MessageActivity.name, userInfo.getName());
-                intent.putExtra(MessageActivity.receiverId, userInfo.getId());
+                intent.putExtra(MessageActivity.receiverId, userInfo.getUid());
                 intent.putExtra(MessageActivity.receiverImage, userInfo.getImageId());
                 mContext.startActivity(intent);
             }

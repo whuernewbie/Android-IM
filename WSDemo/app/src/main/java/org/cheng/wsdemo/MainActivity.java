@@ -17,6 +17,7 @@ import org.cheng.wsdemo.bean.WebSocketMessageBean;
 import org.cheng.wsdemo.enums.MESSAGETYPE;
 import org.cheng.wsdemo.service.WebSocketService;
 import org.cheng.wsdemo.ui.BaseActivity;
+import org.cheng.wsdemo.ui.CreatGroupActivity;
 import org.cheng.wsdemo.ui.FindFriendsActivity;
 import org.cheng.wsdemo.ui.FriendRequestActivity;
 import org.cheng.wsdemo.ui.LoginActivity;
@@ -40,7 +41,7 @@ public class MainActivity extends BaseActivity {
         Intent intentService = new Intent(mContext, WebSocketService.class);
         startService(intentService);
 
-        Intent intent1=new Intent(mContext, MessagesActivity.class);
+        Intent intent1=new Intent(mContext, CreatGroupActivity.class);
         startActivity(intent1);
         finish();
 
