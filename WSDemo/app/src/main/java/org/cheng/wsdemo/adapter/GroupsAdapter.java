@@ -15,13 +15,12 @@ import com.bumptech.glide.Glide;
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.bean.GroupInfo;
 import org.cheng.wsdemo.bean.UserInfo;
+import org.cheng.wsdemo.enums.MESSAGETYPE;
 import org.cheng.wsdemo.ui.MessageActivity;
 
 import java.util.List;
 
 public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder> {
-
-    private static final String TAG = "MsgAdapter";
 
     private Context mContext;
 
@@ -57,9 +56,10 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                 int      position = holder.getAdapterPosition();
                 GroupInfo groupInfo = mGroupList.get(position);
                 Intent   intent   = new Intent(mContext, MessageActivity.class);
-                intent.putExtra(MessageActivity.name, groupInfo.getName());
-                intent.putExtra(MessageActivity.msgTo, groupInfo.getGroupId());
-                intent.putExtra(MessageActivity.receiverImage, groupInfo.getGroupId());
+                intent.putExtra(MessageActivity.name, groupInfo.getGname());
+                intent.putExtra(MessageActivity.msgTo, groupInfo.getGid());
+                intent.putExtra(MessageActivity.receiverImage, groupInfo.getHeadImageUrl());
+                intent.putExtra(MessageActivity.msgType, MESSAGETYPE.GROUPCHAT.toString());
                 mContext.startActivity(intent);
             }
         });
@@ -69,8 +69,9 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         GroupInfo groupInfo = mGroupList.get(position);
-        holder.name.setText(groupInfo.getName());
-        Glide.with(mContext).load(groupInfo.getHeadImageId()).into(holder.userImage);
+
+        holder.name.setText(groupInfo.getGid());
+        Glide.with(mContext).load(groupInfo.getHeadImageUrl()).into(holder.userImage);
     }
 
     @Override

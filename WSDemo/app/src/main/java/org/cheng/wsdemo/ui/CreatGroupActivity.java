@@ -10,18 +10,28 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 
+import com.alibaba.fastjson.JSON;
+
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.adapter.CreateGroupAdapter;
+import org.cheng.wsdemo.bean.CreateGroup;
+import org.cheng.wsdemo.bean.FriendListBean;
 import org.cheng.wsdemo.bean.UserInfo;
+import org.cheng.wsdemo.enums.MESSAGETYPE;
+import org.cheng.wsdemo.service.WebSocketService;
+import org.cheng.wsdemo.util.FakeDataUtil;
+import org.cheng.wsdemo.util.NoticeUtil;
+import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 public class CreatGroupActivity extends AppCompatActivity {
 
-    private List<UserInfo> userInfoList=new ArrayList<>();
+    private List<UserInfo> FriendList=new ArrayList<>();
 
-    private List<UserInfo> result=new ArrayList<>();
+    private String [] result= new String[FakeDataUtil.MaxGroupNum] ;
 
     private CreateGroupAdapter adapter;
 
@@ -48,7 +58,7 @@ public class CreatGroupActivity extends AppCompatActivity {
         GridLayoutManager layoutManager=new GridLayoutManager(this,1);
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter=new CreateGroupAdapter(userInfoList,this);
+        adapter=new CreateGroupAdapter(FriendList,this);
         recyclerView.setAdapter(adapter);
 
         selectAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -76,7 +86,25 @@ public class CreatGroupActivity extends AppCompatActivity {
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               result= adapter.ChooseSelectData();
+                //得到群成员
+                result=FakeDataUtil.removeArrayEmptyTextBackNewArray(adapter.ChooseSelectData());
+
+                CreateGroup createGroup=new CreateGroup();
+                createGroup.setGname(FakeDataUtil.GroupName);
+                createGroup.setMsgFrom(FakeDataUtil.SenderUid);
+                createGroup.setMsgType(MESSAGETYPE.GroupCreate);
+                createGroup.setPerson(result);
+                if(WebSocketService.webSocketConnection.isConnected())
+                {
+                    WebSocketService.webSocketConnection.sendTextMessage(JSON.toJSONString(createGroup));
+                }
+                else
+                {
+                    NoticeUtil.ShowImportMsg(NoticeUtil.NO_CONNECT,CreatGroupActivity.this);
+                }
+
+
+
                //TODO 处理得到的好友集合
             }
         });
@@ -85,8 +113,25 @@ public class CreatGroupActivity extends AppCompatActivity {
 
     }
 
-    private void initFriends(){
+    private void initFriends() {
         //TODO 初始化好友列表
+        List<FriendListBean> friendListBeanList = DataSupport.where("uid1=? or uid2= ?", FakeDataUtil.SenderUid, FakeDataUtil.SenderUid).find(FriendListBean.class);
+        for (FriendListBean friendListBean : friendListBeanList
+        ) {
+            if (friendListBean.getUid1().equals(FakeDataUtil.SenderUid)) {
+                List<UserInfo> userInfo = DataSupport.where("uid = ?", friendListBean.getUid2()).find(UserInfo.class);
+                FriendList.addAll(userInfo);
+            } else {
+                List<UserInfo> userInfo = DataSupport.where("uid = ?", friendListBean.getUid1()).find(UserInfo.class);
+                FriendList.addAll(userInfo);
+            }
+            LinkedHashSet<UserInfo> hashSet   = new LinkedHashSet<>((FriendList));
+            ArrayList<UserInfo>     userInfos = new ArrayList<>(hashSet);
+            FriendList.clear();
+            FriendList.addAll(userInfos);
+
+//TODO 去除重复元素补丁（待修改）
+        }
 
     }
 }

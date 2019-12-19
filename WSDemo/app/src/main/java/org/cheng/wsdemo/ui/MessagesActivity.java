@@ -60,22 +60,20 @@ public class MessagesActivity extends BaseActivity {
             System.out.println(jsonObject.toString());
             try
             {
-                if(jsonObject.get("msgType").equals(MESSAGETYPE.USERCHAT.toString()))
+                if(jsonObject.has("msgType"))
                 {
-                    UserInfo userInfo=new UserInfo();
-                    userInfo.setName(" ");
-                    userInfo.setImageId(R.drawable.banana);
-                    userInfo.setUid(jsonObject.get("msgFrom").toString());
 
                     MsgUi msgUi=new MsgUi();
-                    msgUi.setUserInfo(userInfo);
+                    msgUi.setMsgname(jsonObject.get("msgFrom").toString());
+                    msgUi.setMsgId(jsonObject.get("msgFrom").toString());
                     msgUi.setLastMsg(jsonObject.get("message").toString());
+                    msgUi.setMsgType(MESSAGETYPE.valueOf(jsonObject.get("msgType").toString()));
 
+                    //去除重复消息提示
                     boolean findIt=false;
-
                     for (MsgUi msg:MsgList
                          ) {
-                        if(msg.getUserInfo().getUid().equals(userInfo.getUid()))
+                        if(msg.getMsgId().equals(msgUi.getMsgId()))
                         {
                             msg.setLastMsg(jsonObject.get("message").toString());
                             findIt=true;
@@ -85,6 +83,19 @@ public class MessagesActivity extends BaseActivity {
                     }
                     if(!findIt)
                     {
+                        //从数据库中查找用户或者群聊信息，更新用户显示
+                        if(jsonObject.get("msgType").toString().equals(MESSAGETYPE.USERCHAT.toString()))
+                        {
+                            List<UserInfo> userInfoList=DataSupport.where("uid = ?",msgUi.getMsgId()).find(UserInfo.class);
+                            for (UserInfo user:userInfoList
+                                 ) {
+                                if(user.getUid().equals(msgUi.getMsgId()))
+                                {
+                                    msgUi.setMsgImageUrl(user.getImageUrl());
+                                    msgUi.setMsgname(user.getUname());
+                                }
+                            }
+                        }
                         MsgList.add(msgUi);
                     }
                     adapter.notifyDataSetChanged();

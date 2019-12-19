@@ -1,5 +1,7 @@
 package org.cheng.wsdemo.http;
 
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -25,6 +27,20 @@ public class HttpUtil {
                 .build();
         client.newCall(request).enqueue(callback);
     }
+
+    public static void  postFindGroupInfo(final String address,String gid,final okhttp3.Callback callback)
+    {
+        OkHttpClient client=new OkHttpClient();
+        FormBody.Builder formBody=new FormBody.Builder();
+        formBody.add("gid",gid);
+        Request request=new Request.Builder()
+                .url(address)
+                .post(formBody.build())
+                .build();
+        client.newCall(request).enqueue(callback);
+
+    }
+
 
     public static void postEmail(final String address,String email,final okhttp3.Callback callback)
     {

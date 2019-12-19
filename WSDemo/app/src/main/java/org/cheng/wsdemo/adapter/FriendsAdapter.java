@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.bean.UserInfo;
+import org.cheng.wsdemo.enums.MESSAGETYPE;
 import org.cheng.wsdemo.ui.MessageActivity;
 
 import java.util.List;
@@ -56,9 +57,10 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHold
                 int    position = holder.getAdapterPosition();
                 UserInfo  userInfo    = mFriendsList.get(position);
                 Intent intent   = new Intent(mContext, MessageActivity.class);
-                intent.putExtra(MessageActivity.name, userInfo.getName());
+                intent.putExtra(MessageActivity.name, userInfo.getUname());
                 intent.putExtra(MessageActivity.msgTo, userInfo.getUid());
-                intent.putExtra(MessageActivity.receiverImage, userInfo.getImageId());
+                intent.putExtra(MessageActivity.receiverImage, userInfo.getImageUrl());
+                intent.putExtra(MessageActivity.msgType, MESSAGETYPE.USERCHAT.toString());
                 mContext.startActivity(intent);
             }
         });
@@ -68,8 +70,8 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHold
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         UserInfo userInfo = mFriendsList.get(position);
-        holder.name.setText(userInfo.getName());
-        Glide.with(mContext).load(userInfo.getImageId()).into(holder.userImage);
+        holder.name.setText(userInfo.getUname());
+        Glide.with(mContext).load(userInfo.getImageUrl()).into(holder.userImage);
     }
 
     @Override

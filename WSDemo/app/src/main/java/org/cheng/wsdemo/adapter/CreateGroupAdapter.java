@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide;
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.bean.UserInfo;
 import org.cheng.wsdemo.ui.MessageActivity;
+import org.cheng.wsdemo.util.FakeDataUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,8 @@ public class CreateGroupAdapter extends RecyclerView.Adapter<CreateGroupAdapter.
     private Context mContext;
 
     private List<Boolean> booleanList=new ArrayList<>();
-    private List<UserInfo> result=new ArrayList<>();
+
+    private  String [] result=new String[FakeDataUtil.MaxGroupNum];
 
     private List<UserInfo> mFriendsList;
 
@@ -85,8 +87,8 @@ public class CreateGroupAdapter extends RecyclerView.Adapter<CreateGroupAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         UserInfo userInfo = mFriendsList.get(position);
-        holder.name.setText(userInfo.getName());
-        Glide.with(mContext).load(userInfo.getImageId()).into(holder.userImage);
+        holder.name.setText(userInfo.getUname());
+        Glide.with(mContext).load(userInfo.getImageUrl()).into(holder.userImage);
 
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -112,13 +114,14 @@ public class CreateGroupAdapter extends RecyclerView.Adapter<CreateGroupAdapter.
 
     }
 
-    public List<UserInfo> ChooseSelectData() {
+    public String [] ChooseSelectData() {
 
         int y=0;
         for (int i = 0; i < mFriendsList.size(); i++) {
             if(booleanList.get(i)!=null && booleanList.get(i) ) {
                 //TODO 获得选择的用户
-                result.add(mFriendsList.get(i));
+                result[y]=mFriendsList.get(i).getUid();
+                mFriendsList.remove(i);
                 y++;
                 i--;
             }

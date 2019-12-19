@@ -1,31 +1,54 @@
 package org.cheng.wsdemo.bean;
 
+import org.cheng.wsdemo.util.FakeDataUtil;
 import org.litepal.crud.DataSupport;
 
 public class GroupInfo extends DataSupport {
-    private String groupId;
+    private String gid;
 
-    private String name;
+    private String gname;
 
     private int number;
 
-    private int headImageId;
+    private String headImageUrl;
 
+    private String createTime;
 
-    public String getGroupId() {
-        return groupId;
+    private String owner;
+
+    private String [] person=new String[FakeDataUtil.MaxGroupNum];
+
+    public String[] getPerson() {
+        return person;
     }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
+    public void setPerson(String[] person) {
+        this.person = person;
     }
 
-    public String getName() {
-        return name;
+    public String getGid() {
+        return gid;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setGid(String gid) {
+        this.gid = gid;
+    }
+
+    public String getGname() {
+        return gname;
+    }
+
+    public void setGname(String gname) {
+        this.gname = gname;
+    }
+
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     public int getNumber() {
@@ -36,11 +59,19 @@ public class GroupInfo extends DataSupport {
         this.number = number;
     }
 
-    public int getHeadImageId() {
-        return headImageId;
+    public String getHeadImageUrl() {
+        return headImageUrl;
     }
 
-    public void setHeadImageId(int headImageId) {
-        this.headImageId = headImageId;
+    public void setHeadImageUrl(String headImageUrl) {
+        this.headImageUrl = headImageUrl;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 }

@@ -63,11 +63,15 @@ public class MessageActivity extends AppCompatActivity {
 
     private String rImage;
 
+    private String chatType;
+
     public static final String name = "Name";
 
     public static final String msgTo = "Id";
 
     public static final String receiverImage = "Image";
+
+    public static final String msgType="msgType";
 
     //消息接受
     @Override
@@ -81,8 +85,9 @@ public class MessageActivity extends AppCompatActivity {
         public void mySystemMethod(JSONObject jsonObject) {
             System.out.println(jsonObject.toString());
             try {
-                if (jsonObject.get("msgTo").toString().equals(FakeDataUtil.SenderUid)) {
+                if (jsonObject.get("msgTo").toString().equals(rid)&&!jsonObject.get("msgFrom").toString().equals(FakeDataUtil.SenderUid)) {
                     Msgbean msg = new Msgbean(jsonObject.get("message").toString(), Msgbean.TYPE_RECEIVED);
+
                     msg.setId(jsonObject.get("msgFrom").toString());
                     msg.setName(jsonObject.get("msgFrom").toString());
 
@@ -107,6 +112,7 @@ public class MessageActivity extends AppCompatActivity {
         Intent intent = getIntent();
         rid = intent.getStringExtra(msgTo);
         rname = intent.getStringExtra(name);
+        chatType=intent.getStringExtra(msgType);
         //rImage = intent.getStringExtra(receiverImage);
 
 
@@ -145,7 +151,7 @@ public class MessageActivity extends AppCompatActivity {
                             //建立消息体类
                             WebSocketMessageBean webSocketMessageBean = new WebSocketMessageBean();
                             //消息类型
-                            webSocketMessageBean.setMsgType(MESSAGETYPE.USERCHAT);
+                            webSocketMessageBean.setMsgType(MESSAGETYPE.valueOf(chatType));
                             //用户ID
                             webSocketMessageBean.setMsgFrom(FakeDataUtil.SenderUid);
                             //接收方Id

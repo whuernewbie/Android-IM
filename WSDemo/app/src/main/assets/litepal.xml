@@ -2,7 +2,7 @@
 <litepal>
     <dbname value="TalkTalk" ></dbname>
 
-    <version value="5" ></version>
+    <version value="7" ></version>
 
     <list>
         <mapping class="org.cheng.wsdemo.bean.UserInfo"></mapping>
@@ -11,5 +11,6 @@
         <mapping class="org.cheng.wsdemo.bean.AddFriendsBean"></mapping>
         <mapping class="org.cheng.wsdemo.bean.FriendListBean"></mapping>
         <mapping class="org.cheng.wsdemo.bean.MsgUi"></mapping>
+        <mapping class="org.cheng.wsdemo.bean.GroupListBean"></mapping>
     </list>
 </litepal>

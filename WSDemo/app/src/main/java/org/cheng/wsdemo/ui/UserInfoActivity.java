@@ -17,12 +17,19 @@ import com.bumptech.glide.Glide;
 
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.bean.AddFriendsBean;
+import org.cheng.wsdemo.enums.MESSAGETYPE;
 import org.cheng.wsdemo.service.WebSocketService;
 import org.cheng.wsdemo.util.FakeDataUtil;
 import org.cheng.wsdemo.util.NoticeUtil;
 import org.w3c.dom.Text;
 
 public class UserInfoActivity extends AppCompatActivity {
+
+    private String name;
+
+    private String Id;
+
+    private String ImageUrl;
 
     public static final String NAME = "name";
 
@@ -38,11 +45,6 @@ public class UserInfoActivity extends AppCompatActivity {
 
     private ImageView imageView;
 
-    private String name;
-
-    private String Id="1000002";
-
-    private int ImageId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +53,7 @@ public class UserInfoActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         name = intent.getStringExtra(NAME);
-        ImageId = intent.getIntExtra(IMAGE_ID, 0);
+        ImageUrl = intent.getStringExtra(IMAGE_ID);
         Id = intent.getStringExtra(ID);
 
 
@@ -68,7 +70,7 @@ public class UserInfoActivity extends AppCompatActivity {
                     AddFriendsBean addFriendsBean = new AddFriendsBean();
                     addFriendsBean.setMsgTo(Id);
                     addFriendsBean.setMsgFrom(FakeDataUtil.SenderUid);
-                    addFriendsBean.setMsgType("FriendReq");
+                    addFriendsBean.setMsgType(MESSAGETYPE.FriendReq.toString());
                     addFriendsBean.setActionType("request");
                     WebSocketService.webSocketConnection.sendTextMessage(JSON.toJSONString(addFriendsBean));
 
@@ -87,9 +89,10 @@ public class UserInfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //TODO 限制是否可以聊天
                 Intent intent = new Intent(UserInfoActivity.this, MessageActivity.class);
-                intent.putExtra(MessageActivity.receiverImage, ImageId);
+                intent.putExtra(MessageActivity.receiverImage, ImageUrl);
                 intent.putExtra(MessageActivity.name, name);
                 intent.putExtra(MessageActivity.msgTo, ID);
+                intent.putExtra(MessageActivity.msgType,MESSAGETYPE.USERCHAT);
                 startActivity(intent);
             }
         });
@@ -105,7 +108,7 @@ public class UserInfoActivity extends AppCompatActivity {
         }
 
         collapsingToolbar.setTitle(name);
-        Glide.with(this).load(ImageId).into(imageView);
+        Glide.with(this).load(ImageUrl).into(imageView);
 
         String fruitContent = generateFruitContent(name);
         content_text.setText(fruitContent);

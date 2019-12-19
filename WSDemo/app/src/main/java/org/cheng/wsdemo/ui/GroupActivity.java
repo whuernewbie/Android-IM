@@ -19,6 +19,9 @@ import android.widget.Toast;
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.adapter.GroupsAdapter;
 import org.cheng.wsdemo.bean.GroupInfo;
+import org.cheng.wsdemo.bean.GroupListBean;
+import org.cheng.wsdemo.util.FakeDataUtil;
+import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,10 +136,22 @@ public class GroupActivity extends BaseActivity {
         }).start();
     }
 
-    //初始化好友列表
+    //初始化群组列表
     private void initGroups() {
-        //TODO 初始化群组
+        GroupList.clear();
+        List<GroupListBean> groupListBeans= DataSupport.where("uid = ?", FakeDataUtil.SenderUid).find(GroupListBean.class);
+        List<GroupInfo> groupInfos=DataSupport.findAll(GroupInfo.class);
+        for (GroupListBean group:groupListBeans
+             ) {
 
+            for (GroupInfo groupInfo:groupInfos
+                 ) {
+                if(group.getGid().equals(groupInfo.getGid()))
+                {
+                    GroupList.add(groupInfo);
+                }
+            }
+        }
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

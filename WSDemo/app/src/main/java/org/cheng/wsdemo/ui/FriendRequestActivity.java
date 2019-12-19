@@ -1,5 +1,6 @@
 package org.cheng.wsdemo.ui;
 
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,19 +12,31 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.adapter.AddFriendsAdapter;
 import org.cheng.wsdemo.bean.FriendListBean;
 import org.cheng.wsdemo.bean.AddFriendsBean;
+import org.cheng.wsdemo.bean.GroupInfo;
+import org.cheng.wsdemo.bean.GroupListBean;
 import org.cheng.wsdemo.bean.UserInfo;
+import org.cheng.wsdemo.enums.MESSAGETYPE;
+import org.cheng.wsdemo.http.HttpUtil;
 import org.cheng.wsdemo.service.WebSocketService;
+import org.cheng.wsdemo.util.FakeDataUtil;
 import org.cheng.wsdemo.util.NoticeUtil;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class FriendRequestActivity extends AppCompatActivity {
     private List<AddFriendsBean> addFriendsBeanList=new ArrayList<>();
@@ -122,27 +135,67 @@ public class FriendRequestActivity extends AppCompatActivity {
             AddFriendsBean addFriendsBean=addFriendsBeanList.get(position);
             switch (v.getId()){
                 case R.id.btn_agree:
-                    //TODO 处理好友请求
+                    //TODO 处理好友请求以及加群请求
                     if(WebSocketService.webSocketConnection.isConnected())
                     {
                         addFriendsBeanList.remove(addFriendsBean);
-                        AddFriendsBean addFriendsBean1;
-                        addFriendsBean1=addFriendsBean;
                         addFriendsBean.delete();
-                        addFriendsBean1.setActionType("agree");
+                        addFriendsBean.setActionType("agree");
                         WebSocketService.webSocketConnection.sendTextMessage(JSON.toJSONString(addFriendsBean));
                         adapter.notifyDataSetChanged();
-                        //先存到用户信息表
-                        UserInfo userInfo =new UserInfo();
-                        userInfo.setName(addFriendsBean.getMsgFrom());
-                        userInfo.setUid(addFriendsBean.getMsgFrom());
-                        userInfo.save();
 
-                        //再在用户关系表中绑定用户关系
-                        FriendListBean friendListBean =new FriendListBean();
-                        friendListBean.setUid1(addFriendsBean.getMsgFrom());
-                        friendListBean.setUid2(addFriendsBean.getMsgTo());
-                        friendListBean.save();
+                        //如果同意的是好友请求
+                        if(addFriendsBean.getMsgType().equals(MESSAGETYPE.FriendReq.toString()))
+                        {
+                            //先存到用户信息表 TODO 应当get好友信息
+                            UserInfo userInfo =new UserInfo();
+                            userInfo.setUname(addFriendsBean.getMsgFrom());
+                            userInfo.setUid(addFriendsBean.getMsgFrom());
+                            userInfo.save();
+
+                            //再在用户关系表中绑定用户关系
+                            FriendListBean friendListBean =new FriendListBean();
+                            friendListBean.setUid1(addFriendsBean.getMsgFrom());
+                            friendListBean.setUid2(addFriendsBean.getMsgTo());
+                            friendListBean.save();
+                        }
+                        //如果同意的是群邀请 则添加群关系列表，获取群信息，添加群信息
+                        else if(addFriendsBean.getMsgType().equals(MESSAGETYPE.GroupInvite.toString()))
+                        {
+                            HttpUtil.postFindGroupInfo(FakeDataUtil.FindGroupInfo,addFriendsBean.getMsgFrom(),new okhttp3.Callback(){
+                                @Override
+                                public void onResponse(Call call, Response response) throws IOException {
+                                    String responseData=response.body().string();
+                                    System.out.println(responseData);
+                                    try
+                                    {
+                                        JSONObject jsonObject =new JSONObject(responseData);
+                                        if(jsonObject.get("status").toString().equals("ok"))
+                                        {
+                                            JSONObject jsonObject1 =new JSONObject(jsonObject.get("groupInfo").toString());
+                                            GroupInfo groupInfo=JSON.parseObject(jsonObject1.get("groupInfo").toString(),new TypeReference<GroupInfo>(){});
+                                            groupInfo.save();
+                                            System.out.println(jsonObject.toString());
+                                        }
+                                    }catch (JSONException e)
+                                    {
+                                        //TODO 子线程JSON转换错误
+                                    }
+                                }
+                                @Override
+                                public void onFailure(Call call,IOException e){
+
+                                }
+
+                            });
+
+                            //绑定群关系
+                            GroupListBean groupListBean=new GroupListBean();
+                            groupListBean.setGid(addFriendsBean.getMsgFrom());
+                            groupListBean.setUid(FakeDataUtil.SenderUid);
+                            groupListBean.save();
+                        }
+
                         Toast.makeText(FriendRequestActivity.this,"你点击了同意按钮"+(position+1),Toast.LENGTH_SHORT).show();
                     }else
                     {

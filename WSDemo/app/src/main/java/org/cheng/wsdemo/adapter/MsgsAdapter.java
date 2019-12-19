@@ -56,11 +56,12 @@ public class MsgsAdapter extends RecyclerView.Adapter<MsgsAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
-                MsgUi MsgUi = mMsgsList.get(position);
+                MsgUi msgUi = mMsgsList.get(position);
                 Intent intent = new Intent(mContext, MessageActivity.class);
-                intent.putExtra(MessageActivity.name, MsgUi.getUserInfo().getName());
-                intent.putExtra(MessageActivity.msgTo, MsgUi.getUserInfo().getUid());
-                intent.putExtra(MessageActivity.receiverImage, MsgUi.getUserInfo().getImageId());
+                intent.putExtra(MessageActivity.name, msgUi.getMsgname());
+                intent.putExtra(MessageActivity.msgTo, msgUi.getMsgId());
+                intent.putExtra(MessageActivity.receiverImage, msgUi.getMsgImageUrl());
+                intent.putExtra(MessageActivity.msgType,msgUi.getMsgType().toString());
                 mContext.startActivity(intent);
             }
         });
@@ -70,8 +71,8 @@ public class MsgsAdapter extends RecyclerView.Adapter<MsgsAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         MsgUi MsgUi = mMsgsList.get(position);
-        holder.name.setText(MsgUi.getUserInfo().getName());
-        Glide.with(mContext).load(MsgUi.getUserInfo().getImageId()).into(holder.userImage);
+        holder.name.setText(MsgUi.getMsgname());
+        Glide.with(mContext).load(MsgUi.getMsgImageUrl()).into(holder.userImage);
     }
 
     @Override

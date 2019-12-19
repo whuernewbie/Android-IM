@@ -163,7 +163,7 @@ public class FriendsActivity extends BaseActivity {
                 FriendList.addAll(userInfo);
             }
 
-//TODO 去除重复元素补丁（待修改）
+        //TODO 去除重复元素补丁（待修改）
             LinkedHashSet<UserInfo> hashSet=new LinkedHashSet<>((FriendList));
             ArrayList<UserInfo> userInfos=new ArrayList<>(hashSet);
             FriendList.clear();

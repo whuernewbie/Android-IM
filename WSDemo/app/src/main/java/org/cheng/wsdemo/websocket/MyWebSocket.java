@@ -10,6 +10,8 @@ import com.alibaba.fastjson.TypeReference;
 
 import org.cheng.wsdemo.bean.FriendListBean;
 import org.cheng.wsdemo.bean.AddFriendsBean;
+import org.cheng.wsdemo.bean.GroupInfo;
+import org.cheng.wsdemo.bean.GroupListBean;
 import org.cheng.wsdemo.bean.UserInfo;
 import org.cheng.wsdemo.bean.WebSocketMessageBean;
 import org.cheng.wsdemo.enums.MESSAGETYPE;
@@ -98,9 +100,8 @@ public class MyWebSocket implements Runnable{
                 try
                 {
                     JSONObject jsonObject=new JSONObject(payLoad);
-                    //一般消息处理
                     //好友请求接受处理
-                    if(jsonObject.has("actionType"))
+                    if(jsonObject.get("msgType").toString().equals(MESSAGETYPE.FriendReq.toString()))
                     {
                         AddFriendsBean addFriendsBean=JSON.parseObject(payLoad , new TypeReference<AddFriendsBean>(){});
                         //获取数据库中当前登陆用户收到的好友请求，有好友请求和好友同意两种
@@ -110,7 +111,7 @@ public class MyWebSocket implements Runnable{
                         {
                             //先存到用户信息表
                             UserInfo userInfo=new UserInfo();
-                            userInfo.setName(addFriendsBean.getMsgFrom());
+                            userInfo.setUname(addFriendsBean.getMsgFrom());
                             userInfo.setUid(addFriendsBean.getMsgFrom());
                             userInfo.save();
 
@@ -127,18 +128,70 @@ public class MyWebSocket implements Runnable{
                             addFriendsBean.save();
                         }
                     }
-                    else
+                    if(jsonObject.get("msgType").toString().equals(MESSAGETYPE.USERCHAT.toString())||jsonObject.get("msgType").toString().equals(MESSAGETYPE.GROUPCHAT.toString()))
                     {
-                        if(jsonObject.has("msgType"))
-                        {
 
-                            WebSocketMessageBean webSocketMessageBean=JSON.parseObject(payLoad , new TypeReference<WebSocketMessageBean>(){});
-                            //webSocketMessageBean.getMsgTo()
+                        WebSocketMessageBean webSocketMessageBean=JSON.parseObject(payLoad , new TypeReference<WebSocketMessageBean>(){});
+                        //webSocketMessageBean.getMsgTo()
+                        if(!jsonObject.get("msgFrom").toString().equals(FakeDataUtil.SenderUid))
+                        {
                             webSocketMessageBean.save();
-                            if(webSocketMessageBean.getMsgType().toString().equals("USERCHAT"))
-                            {
-                                myWebSocketHandler.mySystemMethod(jsonObject);
+                        }
+                        if(webSocketMessageBean.getMsgType().toString().equals("USERCHAT")||jsonObject.get("msgType").toString().equals(MESSAGETYPE.GROUPCHAT.toString()))
+                        {
+                            myWebSocketHandler.mySystemMethod(jsonObject);
+                        }
+                    }
+                    //群邀请信息
+                    if(jsonObject.get("msgType").toString().equals(MESSAGETYPE.GroupInvite.toString()))
+                    {
+                        AddFriendsBean addFriendsBean=JSON.parseObject(payLoad , new TypeReference<AddFriendsBean>(){});
+                        //如果  收到  某个用户  同意  加群的消息，先添加用户信息到数据库，再添加用户信息到群聊信息
+                        if(addFriendsBean.getActionType().equals("agree"))
+                        {
+                            //添加到所在群聊
+                            List<GroupInfo> groupInfos=DataSupport.where("gid= ?",addFriendsBean.getMsgTo()).find(GroupInfo.class);
+                            for (GroupInfo groupInfo: groupInfos
+                                 ) {
+                                if(groupInfo.getGid().equals(addFriendsBean.getMsgTo()))
+                                {
+                                    String [] person=groupInfo.getPerson();
+                                    person[person.length]=addFriendsBean.getMsgFrom();
+                                    groupInfo.setPerson(person);
+                                    groupInfo.save();
+                                }
                             }
+                        }
+                        //如果收到邀请本用户加群的信息
+                        else if(addFriendsBean.getActionType().equals("request"))
+                        {
+                            addFriendsBean.save();
+                        }
+
+                    }
+                    //群创建信息
+                    if(jsonObject.get("msgType").toString().equals(MESSAGETYPE.GroupCreate.toString()))
+                    {
+                        if(jsonObject.get("status").toString().equals("ok"))
+                        {
+                            GroupInfo groupInfo=new GroupInfo();
+                            groupInfo.setGid(jsonObject.get("gid").toString());
+                            groupInfo.setGname(FakeDataUtil.GroupName);
+                            groupInfo.setOwner(FakeDataUtil.SenderUid);
+                            groupInfo.setNumber(1);
+                            String [] person=new String[]{FakeDataUtil.SenderUid};
+                            groupInfo.setPerson(person);
+
+                            groupInfo.save();
+
+                            GroupListBean groupListBean=new GroupListBean();
+                            groupListBean.setUid(FakeDataUtil.SenderUid);
+                            groupListBean.setGid(jsonObject.get("gid").toString());
+                            groupListBean.save();
+                        }
+                        else
+                        {
+                            //TODO 群创建失败
                         }
                     }
                     Log.i(TAG  , "接收到返回数据 : " + payLoad);
@@ -156,8 +209,8 @@ public class MyWebSocket implements Runnable{
                 try
                 {
                     JSONObject jsonObject=new org.json.JSONObject(JSONTokener(payLoad));
-                    System.out.println(jsonObject.has("msgType"));
 
+                    //如果收到的是离线消息
                     if(jsonObject.has("offline_message"))
                     {
                         JSONArray jsonArray=new JSONArray(jsonObject.get("offline_message").toString());
@@ -169,7 +222,9 @@ public class MyWebSocket implements Runnable{
                                 handMessage(jsonObject1.get("msg").toString());
                             }
                         }
-                    }else
+                    }
+                    //如果收到的是一般消息
+                    else
                     {
                         handMessage(payLoad);
                     }
