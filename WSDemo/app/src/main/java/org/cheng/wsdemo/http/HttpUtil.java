@@ -1,5 +1,7 @@
 package org.cheng.wsdemo.http;
 
+import org.cheng.wsdemo.bean.UserInfo;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -39,6 +41,33 @@ public class HttpUtil {
                 .build();
         client.newCall(request).enqueue(callback);
 
+    }
+
+    public static void postFindUserInfo(final String address, UserInfo userInfo,final  okhttp3.Callback callback){
+        OkHttpClient client=new OkHttpClient();
+        FormBody.Builder formBody=new FormBody.Builder();
+        formBody.add("uid",userInfo.getUid());
+        formBody.add("uname",userInfo.getUname());
+        formBody.add("email",userInfo.getEmail());
+        formBody.add("sex",userInfo.getEmail());
+        //TODO 传输用户更新信息
+        Request request=new Request.Builder()
+                .url(address)
+                .post(formBody.build())
+                .build();
+        client.newCall(request).enqueue(callback);
+    }
+
+    public static void postFindUserInfo(final String address,String uid,final okhttp3.Callback callback)
+    {
+        OkHttpClient client=new OkHttpClient();
+        FormBody.Builder formBody=new FormBody.Builder();
+        formBody.add("uid",uid);
+        Request request=new Request.Builder()
+                .url(address)
+                .post(formBody.build())
+                .build();
+        client.newCall(request).enqueue(callback);
     }
 
 

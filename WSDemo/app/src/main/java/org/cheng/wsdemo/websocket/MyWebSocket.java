@@ -52,7 +52,7 @@ public class MyWebSocket implements Runnable{
     private static Timer wsReconnectTimer = null;
     private static TimerTask wsReconnectTimerTask = null;
 
-    private static final int DELAY = 1000;
+    private static final int DELAY = 5000;
 
 
     @Override

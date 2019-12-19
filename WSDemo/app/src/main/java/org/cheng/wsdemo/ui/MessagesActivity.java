@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.adapter.MsgsAdapter;
+import org.cheng.wsdemo.bean.GroupInfo;
 import org.cheng.wsdemo.bean.MsgUi;
 import org.cheng.wsdemo.bean.UserInfo;
 import org.cheng.wsdemo.bean.WebSocketMessageBean;
@@ -76,6 +77,7 @@ public class MessagesActivity extends BaseActivity {
                         if(msg.getMsgId().equals(msgUi.getMsgId()))
                         {
                             msg.setLastMsg(jsonObject.get("message").toString());
+
                             findIt=true;
                             break;
                         }
@@ -94,6 +96,16 @@ public class MessagesActivity extends BaseActivity {
                                     msgUi.setMsgImageUrl(user.getImageUrl());
                                     msgUi.setMsgname(user.getUname());
                                 }
+                            }
+                        }
+                        else if(jsonObject.get("msgType").toString().equals(MESSAGETYPE.GROUPCHAT.toString()))
+                        {
+                            List<GroupInfo> groupInfoList=DataSupport.where("gid = ?",msgUi.getMsgId()).find(GroupInfo.class);
+                            for (GroupInfo groupinfo:groupInfoList
+                                 ) {
+                                msgUi.setMsgImageUrl(groupinfo.getHeadImageUrl());
+                                msgUi.setMsgname(groupinfo.getGname());
+
                             }
                         }
                         MsgList.add(msgUi);

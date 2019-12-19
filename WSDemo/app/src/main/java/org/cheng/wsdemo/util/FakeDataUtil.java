@@ -17,6 +17,8 @@ public class FakeDataUtil {
     public static final String AuthHttpAddress = HttpAddress + "auth&type=register";
     public static final String FindFriendsAddress = HttpAddress + "search&type=user";
     public static final String FindGroupInfo=HttpAddress+"search&type=group&detail";
+    public static final String FindUserInfo=HttpAddress+"search&type=user";
+    public static final String UpdateUserInfo=HttpAddress+"update";
 
 
     public static  String[] removeArrayEmptyTextBackNewArray(String[] strArray) {
