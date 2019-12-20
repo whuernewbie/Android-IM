@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.bean.AddFriendsBean;
+import org.cheng.wsdemo.bean.FriendListBean;
 import org.cheng.wsdemo.bean.UserInfo;
 import org.cheng.wsdemo.enums.MESSAGETYPE;
 import org.cheng.wsdemo.http.HttpUtil;
@@ -27,9 +28,12 @@ import org.cheng.wsdemo.util.FakeDataUtil;
 import org.cheng.wsdemo.util.NoticeUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.litepal.crud.DataSupport;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -86,8 +90,16 @@ public class UserInfoActivity extends AppCompatActivity {
         tvUid=(TextView)findViewById(R.id.uid);
         tvUname=(TextView)findViewById(R.id.uname);
 
+        //TODO 数据库操作
+        List<FriendListBean> friendListBeanList = DataSupport.where("(uid1=? and uid2= ?)or(uid1 = ? and uid2=?)",Id,FakeDataUtil.SenderUid,FakeDataUtil.SenderUid,Id).find(FriendListBean.class);
+
         AddFriends=(FloatingActionButton)findViewById(R.id.AddFrinds);
         SendMsg=(FloatingActionButton)findViewById(R.id.SendMsg);
+
+        if(friendListBeanList.size()>0)
+        {
+            AddFriends.hide();
+        }
 
         AddFriends.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,7 +133,7 @@ public class UserInfoActivity extends AppCompatActivity {
                 intent.putExtra(MessageActivity.receiverImage, ImageUrl);
                 intent.putExtra(MessageActivity.name, name);
                 intent.putExtra(MessageActivity.msgTo, ID);
-                intent.putExtra(MessageActivity.msgType,MESSAGETYPE.USERCHAT);
+                intent.putExtra(MessageActivity.msgType,MESSAGETYPE.USERCHAT.toString());
                 startActivity(intent);
             }
         });

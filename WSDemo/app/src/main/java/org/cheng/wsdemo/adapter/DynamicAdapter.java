@@ -84,7 +84,7 @@ public class DynamicAdapter extends RecyclerView.Adapter<DynamicAdapter.ViewHold
         holder.content.setText(dynamicBean.getContent());
         holder.location.setText(dynamicBean.getAddress());
         holder.name.setText(dynamicBean.getUname());
-        Glide.with(mContext).load(dynamicBean.getHeadImageUrl()).into(holder.userImage);
+        //Glide.with(mContext).load(dynamicBean.getHeadImageUrl()).into(holder.userImage);
     }
 
     @Override

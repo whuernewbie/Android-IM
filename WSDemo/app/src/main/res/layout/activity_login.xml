@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp">
         <TextView
-            android:layout_width="90dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:textSize="18sp"
@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp">
         <TextView
-            android:layout_width="90dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:textSize="18sp"
@@ -69,6 +69,7 @@
             android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
+            android:background="@android:color/holo_blue_bright"
             android:text="Login" />
 
         <Button
@@ -76,6 +77,7 @@
             android:layout_height="60dp"
             android:layout_weight="1"
             android:text="Sign in"
+            android:background="@android:color/holo_blue_dark"
             android:layout_width="wrap_content" />
     </LinearLayout>
     <TextView

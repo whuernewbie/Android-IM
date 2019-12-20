@@ -63,7 +63,7 @@
                                 android:layout_gravity="left"
                                 android:text="Talk Talk Number:"
                                 android:textSize="20dp"/>
-                            <EditText
+                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"
@@ -231,6 +231,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:id="@+id/save"
+                        android:text="Save"
                         android:layout_marginLeft="40dp"
                         android:layout_marginRight="40dp"
                         android:layout_gravity="center"

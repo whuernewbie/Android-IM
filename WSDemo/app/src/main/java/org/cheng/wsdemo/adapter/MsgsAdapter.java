@@ -32,12 +32,14 @@ public class MsgsAdapter extends RecyclerView.Adapter<MsgsAdapter.ViewHolder> {
         CardView cardView;
         ImageView userImage;
         TextView name;
+        TextView lastMsg;
 
         public ViewHolder(View view) {
             super(view);
             cardView = (CardView) view;
             userImage = (ImageView) view.findViewById(R.id.image);
             name = (TextView) view.findViewById(R.id.name);
+            lastMsg=(TextView)view.findViewById(R.id.lastMsg);
         }
     }
 
@@ -72,7 +74,8 @@ public class MsgsAdapter extends RecyclerView.Adapter<MsgsAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         MsgUi MsgUi = mMsgsList.get(position);
         holder.name.setText(MsgUi.getMsgname());
-        Glide.with(mContext).load(MsgUi.getMsgImageUrl()).into(holder.userImage);
+        holder.lastMsg.setText(MsgUi.getLastMsg());
+        ////Glide.with(mContext).load(MsgUi.getMsgImageUrl()).into(holder.userImage);
     }
 
     @Override

@@ -71,7 +71,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
         GroupInfo groupInfo = mGroupList.get(position);
 
         holder.name.setText(groupInfo.getGid());
-        Glide.with(mContext).load(groupInfo.getHeadImageUrl()).into(holder.userImage);
+        //Glide.with(mContext).load(groupInfo.getHeadImageUrl()).into(holder.userImage);
     }
 
     @Override

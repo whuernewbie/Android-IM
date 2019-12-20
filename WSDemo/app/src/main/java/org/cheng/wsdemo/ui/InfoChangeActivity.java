@@ -21,6 +21,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.bean.FriendListBean;
 import org.cheng.wsdemo.adapter.FriendsAdapter;
@@ -29,15 +32,21 @@ import org.cheng.wsdemo.bean.UserInfo;
 import org.cheng.wsdemo.enums.MESSAGETYPE;
 import org.cheng.wsdemo.http.HttpUtil;
 import org.cheng.wsdemo.util.FakeDataUtil;
+import org.cheng.wsdemo.util.NoticeUtil;
+import org.cheng.wsdemo.util.WebSocketUtil;
 import org.cheng.wsdemo.websocket.MyWebSocket;
 import org.cheng.wsdemo.websocket.MyWebSocketHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class InfoChangeActivity extends BaseActivity {
 
@@ -45,7 +54,7 @@ public class InfoChangeActivity extends BaseActivity {
 
     private SwipeRefreshLayout swipeRefresh;
 
-    private EditText tvUid;
+    private TextView tvUid;
 
     private EditText tvUname;
 
@@ -74,7 +83,7 @@ public class InfoChangeActivity extends BaseActivity {
         tvEmail=(EditText)findViewById(R.id.email);
         tvMoreInfo=(EditText)findViewById(R.id.moreInfo);
         tvSex=(EditText)findViewById(R.id.sex);
-        tvUid=(EditText)findViewById(R.id.uid);
+        tvUid=(TextView) findViewById(R.id.uid);
         tvUname=(EditText)findViewById(R.id.uname);
 
         save=(Button)findViewById(R.id.save);
@@ -145,6 +154,53 @@ public class InfoChangeActivity extends BaseActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int age;
+                try
+                {
+                    UserInfo userInfo=new UserInfo();
+                    age=Integer.valueOf(tvAge.getText().toString()).intValue();
+                    int sex=Integer.valueOf(tvSex.getText().toString()).intValue();
+                    userInfo.setAge(age);
+                    userInfo.setUname(tvUname.getText().toString());
+                    userInfo.setMoreInfo(tvMoreInfo.getText().toString());
+                    userInfo.setEmail(tvEmail.getText().toString());
+                    userInfo.setSex(sex);
+
+                    HttpUtil.postChangeUserInfo(FakeDataUtil.UpdateUserInfo,userInfo,new okhttp3.Callback(){
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            String responseData=response.body().string();
+                            try
+                            {
+                                JSONObject jsonObject=new JSONObject(responseData);
+                                System.out.println("成功成功成功"+jsonObject.get("status").toString());
+                                if(jsonObject.get("status").toString().equals("ok"))
+                                {
+
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            NoticeUtil.ShowImportMsg("成功",InfoChangeActivity.this);
+                                        }
+                                    });
+                                }
+                            }catch (JSONException e)
+                            {
+                                //TODO 子线程JSON格式转换错误
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call call,IOException e){
+                            //TODO 子线程http传输错误
+                        }
+                    });
+
+                }catch (Exception e)
+                {
+                    NoticeUtil.ShowImportMsg("Please input right information",InfoChangeActivity.this);
+                }
+
+
                 //TODO 保存修改
             }
         });
@@ -168,19 +224,80 @@ public class InfoChangeActivity extends BaseActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                runOnUiThread(new Runnable() {
+                HttpUtil.postFindUserInfo(FakeDataUtil.FindUserInfo,FakeDataUtil.SenderUid,new okhttp3.Callback(){
                     @Override
-                    public void run() {
-                        swipeRefresh.setRefreshing(false);
+                    public void onResponse(Call call, Response response) throws IOException {
+                        String responseData=response.body().string();
+                        System.out.println(responseData);
+                        try
+                        {
+                            JSONObject jsonObject =new JSONObject(responseData);
+                            if(jsonObject.get("status").toString().equals("ok"))
+                            {
+                                final UserInfo userInfo = JSON.parseObject(jsonObject.get("userInfo").toString(),new TypeReference<UserInfo>(){});
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        tvAge.setText(" "+userInfo.getAge());
+                                        tvEmail.setText(" "+userInfo.getEmail());
+                                        tvMoreInfo.setText(" "+userInfo.getMoreInfo());
+                                        tvSex.setText(" "+userInfo.getSex());
+                                        tvUid.setText(" "+userInfo.getUid());
+                                        tvUname.setText(" "+userInfo.getUname());
+                                    }
+                                });
+                            }
+                        }catch (JSONException e)
+                        {
+                            //TODO 子线程JSON转换错误
+                        }
                     }
+                    @Override
+                    public void onFailure(Call call,IOException e){
+
+                    }
+
                 });
             }
         }).start();
     }
 
-    //初始化好友列表，先从好友关系表中找出所有的好友，再根据好友id去用户信息表中查找用户信息，输出到friendList中
+
     private void initInfo() {
-        //TODO 初始化
+        HttpUtil.postFindUserInfo(FakeDataUtil.FindUserInfo,FakeDataUtil.SenderUid,new okhttp3.Callback(){
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseData=response.body().string();
+                System.out.println(responseData);
+                try
+                {
+                    JSONObject jsonObject =new JSONObject(responseData);
+                    if(jsonObject.get("status").toString().equals("ok"))
+                    {
+                        final UserInfo userInfo =JSON.parseObject(jsonObject.get("userInfo").toString(),new TypeReference<UserInfo>(){});
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                tvAge.setText(" "+userInfo.getAge());
+                                tvEmail.setText(" "+userInfo.getEmail());
+                                tvMoreInfo.setText(" "+userInfo.getMoreInfo());
+                                tvSex.setText(" "+userInfo.getSex());
+                                tvUid.setText(" "+userInfo.getUid());
+                                tvUname.setText(" "+userInfo.getUname());
+                            }
+                        });
+                    }
+                }catch (JSONException e)
+                {
+                    //TODO 子线程JSON转换错误
+                }
+            }
+            @Override
+            public void onFailure(Call call,IOException e){
+
+            }
+
+        });
 
     }
 

@@ -175,7 +175,7 @@ public class FriendRequestActivity extends AppCompatActivity {
                                         {
                                             JSONObject jsonObject1 =new JSONObject(jsonObject.get("groupInfo").toString());
                                             GroupInfo  groupInfo   =JSON.parseObject(jsonObject1.get("groupInfo").toString(),new TypeReference<GroupInfo>(){});
-                                            JSONArray  json =new JSONArray(jsonObject.get("person").toString());
+                                            JSONArray  json =new JSONArray(jsonObject1.get("person").toString());
                                             String person=new String();
                                             for(int i=0;i<json.length();i++)
                                             {
@@ -188,6 +188,7 @@ public class FriendRequestActivity extends AppCompatActivity {
                                         }
                                     }catch (JSONException e)
                                     {
+                                        e.printStackTrace();
                                         //TODO 子线程JSON转换错误
                                     }
                                 }

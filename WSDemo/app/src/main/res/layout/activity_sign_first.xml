@@ -8,6 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/cardview_shadow_end_color"
         android:orientation="vertical">
         <TextView
             android:layout_width="match_parent"
@@ -48,6 +49,7 @@
                 android:id="@+id/sendEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@android:color/holo_blue_bright"
                 android:text="Send Email" />
 
         </LinearLayout>
@@ -96,6 +98,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Finish And Login"
+            android:background="@android:color/holo_blue_dark"
             android:id="@+id/finish"/>
 
 

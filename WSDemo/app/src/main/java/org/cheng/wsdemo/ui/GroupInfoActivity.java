@@ -67,8 +67,8 @@ public class GroupInfoActivity extends AppCompatActivity {
         tvCreateTime=(TextView)findViewById(R.id.CreateTime);
         tvMember=(TextView)findViewById(R.id.member);
         tvSize=(TextView)findViewById(R.id.size);
-        tvGid=(TextView)findViewById(R.id.uid);
-        tvGname=(TextView)findViewById(R.id.uname);
+        tvGid=(TextView)findViewById(R.id.gid);
+        tvGname=(TextView)findViewById(R.id.gname);
 
 
 
@@ -85,7 +85,7 @@ public class GroupInfoActivity extends AppCompatActivity {
         }
         tvOwner.setText(groupInfo.getOwner());
         tvCreateTime.setText(groupInfo.getCreateTime());
-        tvSize.setText(groupInfo.getNumber());
+        tvSize.setText(groupInfo.getNumber()+"");
         tvGid.setText(gId);
         tvGname.setText(groupInfo.getGname());
         tvMember.setText(groupInfo.getPerson());

@@ -48,9 +48,9 @@ public class LoginActivity extends BaseActivity {
     private String uid="";
     private String psd="";
 
-    public static String userId="";
+    public static String userId="Id";
 
-    public static String userPsd="";
+    public static String userPsd="psd";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

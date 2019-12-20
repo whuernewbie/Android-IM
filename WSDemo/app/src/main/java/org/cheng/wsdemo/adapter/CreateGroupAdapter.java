@@ -88,7 +88,7 @@ public class CreateGroupAdapter extends RecyclerView.Adapter<CreateGroupAdapter.
     public void onBindViewHolder(ViewHolder holder, final int position) {
         UserInfo userInfo = mFriendsList.get(position);
         holder.name.setText(userInfo.getUname());
-        Glide.with(mContext).load(userInfo.getImageUrl()).into(holder.userImage);
+        ////Glide.with(mContext).load(userInfo.getImageUrl()).into(holder.userImage);
 
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

@@ -63,12 +63,23 @@ public class MessagesActivity extends BaseActivity {
             {
                 if(jsonObject.has("msgType"))
                 {
-
                     MsgUi msgUi=new MsgUi();
-                    msgUi.setMsgname(jsonObject.get("msgFrom").toString());
-                    msgUi.setMsgId(jsonObject.get("msgFrom").toString());
-                    msgUi.setLastMsg(jsonObject.get("message").toString());
-                    msgUi.setMsgType(MESSAGETYPE.valueOf(jsonObject.get("msgType").toString()));
+                    if(jsonObject.get("msgType").equals(MESSAGETYPE.USERCHAT))
+                    {
+                        msgUi.setMsgname(jsonObject.get("msgFrom").toString());
+                        msgUi.setMsgId(jsonObject.get("msgFrom").toString());
+                        msgUi.setLastMsg(jsonObject.get("message").toString());
+                        msgUi.setMsgType(MESSAGETYPE.valueOf(jsonObject.get("msgType").toString()));
+
+                    }else
+                    {
+                        msgUi.setMsgname(jsonObject.get("msgTo").toString()+jsonObject.get("msgTo").toString());
+                        msgUi.setMsgId(jsonObject.get("msgTo").toString());
+                        msgUi.setLastMsg(jsonObject.get("message").toString());
+                        msgUi.setMsgType(MESSAGETYPE.valueOf(jsonObject.get("msgType").toString()));
+
+                    }
+
 
                     //去除重复消息提示
                     boolean findIt=false;

@@ -247,7 +247,7 @@ public class MessageActivity extends AppCompatActivity {
                     msgList.add(msg1);
                 } else
                     {
-                    Msgbean msg1 = new Msgbean(wb.getMessage(), Msgbean.TYPE_SENT);
+                    Msgbean msg1 = new Msgbean(wb.getMessage(), Msgbean.TYPE_RECEIVED);
                     msg1.setId(wb.getMsgFrom());
                     msg1.setName("");
                     msgList.add(msg1);

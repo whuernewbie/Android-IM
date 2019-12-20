@@ -71,7 +71,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHold
     public void onBindViewHolder(ViewHolder holder, int position) {
         UserInfo userInfo = mFriendsList.get(position);
         holder.name.setText(userInfo.getUname());
-        Glide.with(mContext).load(userInfo.getImageUrl()).into(holder.userImage);
+        ////Glide.with(mContext).load(userInfo.getImageUrl()).into(holder.userImage);
     }
 
     @Override

@@ -46,13 +46,14 @@ public class HttpUtil {
 
     }
 
-    public static void postFindUserInfo(final String address, UserInfo userInfo,final  okhttp3.Callback callback){
+    public static void postChangeUserInfo(final String address, UserInfo userInfo,final  okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
         FormBody.Builder formBody=new FormBody.Builder();
-        formBody.add("uid",userInfo.getUid());
         formBody.add("uname",userInfo.getUname());
         formBody.add("email",userInfo.getEmail());
         formBody.add("sex",userInfo.getEmail());
+        formBody.add("Age",userInfo.getAge()+"");
+        formBody.add("moreInfo",userInfo.getMoreInfo());
         //TODO 传输用户更新信息
         Request request=new Request.Builder()
                 .url(address)

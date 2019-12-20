@@ -1,9 +1,12 @@
 package org.cheng.wsdemo.ui;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -24,6 +27,7 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.SDKInitializer;
 
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.adapter.DynamicAdapter;
@@ -72,6 +76,27 @@ public class DynamicShowActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
+
+        mLocationClient=new LocationClient(getApplicationContext());
+        mLocationClient.registerLocationListener(new MyLocationListener());
+        SDKInitializer.initialize(getApplicationContext());
+
+        List<String> permissionList = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(DynamicShowActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(DynamicShowActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.READ_PHONE_STATE);
+        }
+        if (ContextCompat.checkSelfPermission(DynamicShowActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (!permissionList.isEmpty()) {
+            String [] permissions = permissionList.toArray(new String[permissionList.size()]);
+            ActivityCompat.requestPermissions(DynamicShowActivity.this, permissions, 1);
+        } else {
+            requestLocation();
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -171,7 +196,6 @@ public class DynamicShowActivity extends BaseActivity {
                     public void run() {
                         //TODO 刷新动态页面
                         DynamicList.clear();
-                        initDynamic();
                         HttpUtil.DownloadDynamic(FakeDataUtil.DownloadDynamic,FakeDataUtil.SenderUid,dynamicBean.getLocationx(),dynamicBean.getLocationy(),start,end,new Callback(){
                             @Override
                             public void onResponse(Call call, Response response) throws IOException {
@@ -193,7 +217,7 @@ public class DynamicShowActivity extends BaseActivity {
                                                  ) {
                                                 if(dynamic.getUid().equals(dynamicBean.getUid())&&dynamic.getTime()!=null&&dynamic.getTime().equals(dynamicBean.getTime()))
                                                 {
-                                                findit=true;
+                                                    findit=true;
                                                 }
                                             }
                                             if(!findit)
@@ -307,7 +331,7 @@ public class DynamicShowActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mLocationClient.stop();
+        //mLocationClient.stop();
     }
 
 
