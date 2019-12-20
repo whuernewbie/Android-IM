@@ -3,7 +3,6 @@ package org.cheng.wsdemo.ui;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -16,33 +15,27 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
 import org.cheng.wsdemo.R;
-import org.cheng.wsdemo.bean.FriendListBean;
+import org.cheng.wsdemo.adapter.DynamicAdapter;
 import org.cheng.wsdemo.adapter.FriendsAdapter;
-import org.cheng.wsdemo.adapter.MsgsAdapter;
+import org.cheng.wsdemo.bean.DynamicBean;
+import org.cheng.wsdemo.bean.FriendListBean;
 import org.cheng.wsdemo.bean.UserInfo;
-import org.cheng.wsdemo.enums.MESSAGETYPE;
 import org.cheng.wsdemo.util.FakeDataUtil;
-import org.cheng.wsdemo.websocket.MyWebSocket;
-import org.cheng.wsdemo.websocket.MyWebSocketHandler;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-public class FriendsActivity extends BaseActivity {
+public class DynamicShowActivity extends BaseActivity {
 
     private DrawerLayout mDrawerLayout;
 
-    private List<UserInfo> FriendList = new ArrayList<>();
+    private List<DynamicBean> DynamicList = new ArrayList<>();
 
-    private FriendsAdapter adapter;
+    private DynamicAdapter adapter;
 
     private SwipeRefreshLayout swipeRefresh;
 
@@ -52,10 +45,12 @@ public class FriendsActivity extends BaseActivity {
         setContentView(R.layout.activity_friends);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
 
+        setSupportActionBar(toolbar);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -64,7 +59,7 @@ public class FriendsActivity extends BaseActivity {
         }
 
         //打开侧边菜单，默认点击friends
-        navView.setCheckedItem(R.id.nav_friends);
+        navView.setCheckedItem(R.id.nav_dynamic);
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -72,27 +67,27 @@ public class FriendsActivity extends BaseActivity {
                 {
                     case R.id.nav_msg:
                         mDrawerLayout.closeDrawers();
-                        Intent intent=new Intent(FriendsActivity.this,MessagesActivity.class);
+                        Intent intent=new Intent(DynamicShowActivity.this,MessagesActivity.class);
                         startActivity(intent);
                         finish();
                         break;
                     case R.id.nav_friends:
                         mDrawerLayout.closeDrawers();
+                        Intent intent2=new Intent(DynamicShowActivity.this,FriendsActivity.class);
+                        startActivity(intent2);
+                        finish();
                         break;
                     case R.id.nav_group:
                         mDrawerLayout.closeDrawers();
-                        Intent intent1=new Intent(FriendsActivity.this,GroupActivity.class);
+                        Intent intent1=new Intent(DynamicShowActivity.this,GroupActivity.class);
                         startActivity(intent1);
                         finish();
                         break;
                     case R.id.nav_dynamic:
                         mDrawerLayout.closeDrawers();
-                        Intent intent2=new Intent(FriendsActivity.this,DynamicShowActivity.class);
-                        startActivity(intent2);
                         break;
                     case R.id.nav_Info:
-                        mDrawerLayout.closeDrawers();
-                        Intent intent3=new Intent(FriendsActivity.this,InfoChangeActivity.class);
+                        Intent intent3=new Intent(DynamicShowActivity.this,InfoChangeActivity.class);
                         startActivity(intent3);
                         finish();
                         break;
@@ -108,18 +103,18 @@ public class FriendsActivity extends BaseActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               //TODO 圆形控件点击事件处理
+                //TODO 圆形控件点击事件处理
             }
         });
 
 
         //初始化消息列表界面，下拉刷新
-        initFriends();
+        initDynamic();
         RecyclerView      recyclerView  = (RecyclerView) findViewById(R.id.recycler_view);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 1);
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new FriendsAdapter(FriendList);
+        adapter = new DynamicAdapter(DynamicList);
         recyclerView.setAdapter(adapter);
 
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
@@ -127,12 +122,12 @@ public class FriendsActivity extends BaseActivity {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshFriends();
+                refreshDynamic();
             }
         });
     }
 
-    private void refreshFriends() {
+    private void refreshDynamic() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -144,8 +139,9 @@ public class FriendsActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        FriendList.clear();
-                        initFriends();
+                        //TODO 刷新动态页面
+                        DynamicList.clear();
+                        initDynamic();
                         adapter.notifyDataSetChanged();
                         swipeRefresh.setRefreshing(false);
                     }
@@ -154,29 +150,9 @@ public class FriendsActivity extends BaseActivity {
         }).start();
     }
 
-    //初始化好友列表，先从好友关系表中找出所有的好友，再根据好友id去用户信息表中查找用户信息，输出到friendList中
-    private void initFriends() {
-        List<FriendListBean> friendListBeanList = DataSupport.where("uid1=? or uid2= ?",FakeDataUtil.SenderUid,FakeDataUtil.SenderUid).find(FriendListBean.class);
-        for (FriendListBean friendListBean: friendListBeanList
-             ) {
-            if(friendListBean.getUid1().equals(FakeDataUtil.SenderUid))
-            {
-                List<UserInfo> userInfo=DataSupport.where("uid = ?",friendListBean.getUid2()).find(UserInfo.class);
-                FriendList.addAll(userInfo);
-            }else{
-                List<UserInfo> userInfo=DataSupport.where("uid = ?",friendListBean.getUid1()).find(UserInfo.class);
-                FriendList.addAll(userInfo);
-            }
-
-        //TODO 去除重复元素补丁（待修改）
-            LinkedHashSet<UserInfo> hashSet=new LinkedHashSet<>((FriendList));
-            ArrayList<UserInfo> userInfos=new ArrayList<>(hashSet);
-            FriendList.clear();
-            FriendList.addAll(userInfos);
-
-        }
-
-        //TODO 初始化好友列表
+    //初始化动态列表
+    private void initDynamic() {
+        //TODO 初始化动态列表
 
     }
 

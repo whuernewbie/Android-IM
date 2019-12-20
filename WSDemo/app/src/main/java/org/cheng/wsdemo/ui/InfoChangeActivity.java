@@ -101,6 +101,7 @@ public class InfoChangeActivity extends BaseActivity {
                         finish();
                         break;
                     case R.id.nav_friends:
+                        mDrawerLayout.closeDrawers();
                         Intent intent2=new Intent(InfoChangeActivity.this,FriendsActivity.class);
                         startActivity(intent2);
                         break;
@@ -111,6 +112,10 @@ public class InfoChangeActivity extends BaseActivity {
                         finish();
                         break;
                     case R.id.nav_dynamic:
+                        mDrawerLayout.closeDrawers();
+                        Intent intent3=new Intent(InfoChangeActivity.this,DynamicShowActivity.class);
+                        startActivity(intent3);
+                        finish();
                         //TODO 转动态
                         break;
                     case R.id.nav_Info:

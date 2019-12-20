@@ -119,7 +119,6 @@ public class CreateGroupAdapter extends RecyclerView.Adapter<CreateGroupAdapter.
         int y=0;
         for (int i = 0; i < mFriendsList.size(); i++) {
             if(booleanList.get(i)!=null && booleanList.get(i) ) {
-                //TODO 获得选择的用户
                 result[y]=mFriendsList.get(i).getUid();
                 mFriendsList.remove(i);
                 y++;
@@ -128,7 +127,7 @@ public class CreateGroupAdapter extends RecyclerView.Adapter<CreateGroupAdapter.
         }
         notifyDataSetChanged();
         if(y==0){
-            //TODO 未选择数据
+            //TODO 提示未选择数据
         }
         return result;
     }

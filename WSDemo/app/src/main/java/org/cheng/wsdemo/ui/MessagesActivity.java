@@ -163,10 +163,16 @@ public class MessagesActivity extends BaseActivity {
                         finish();
                         break;
                     case R.id.nav_dynamic:
-                        //TODO 动态页面
+                        mDrawerLayout.closeDrawers();
+                        Intent intent2=new Intent(MessagesActivity.this,DynamicShowActivity.class);
+                        startActivity(intent2);
+                        finish();
                         break;
                     case R.id.nav_Info:
-                        //TODO 个人信息界面
+                        mDrawerLayout.closeDrawers();
+                        Intent intent3=new Intent(MessagesActivity.this,InfoChangeActivity.class);
+                        startActivity(intent3);
+                        finish();
                         break;
                     case R.id.nav_view:
                         break;

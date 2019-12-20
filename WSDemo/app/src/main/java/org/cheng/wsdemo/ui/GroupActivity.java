@@ -74,10 +74,14 @@ public class GroupActivity extends BaseActivity {
                         mDrawerLayout.closeDrawers();
                         break;
                     case R.id.nav_dynamic:
-                        //TODO 转动态
+                        mDrawerLayout.closeDrawers();
+                        Intent intent2=new Intent(GroupActivity.this,DynamicShowActivity.class);
+                        startActivity(intent2);
                         break;
                     case R.id.nav_Info:
-                        //TODO 转个人信息
+                        mDrawerLayout.closeDrawers();
+                        Intent intent3=new Intent(GroupActivity.this,InfoChangeActivity.class);
+                        startActivity(intent3);
                         break;
                     case R.id.nav_view:
                         break;
