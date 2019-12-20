@@ -186,14 +186,9 @@ public class MessagesActivity extends BaseActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Data deleted", Snackbar.LENGTH_SHORT)
-                        .setAction("Undo", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Toast.makeText(MessagesActivity.this, "Data restored", Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .show();
+                Intent intent=new Intent(MessagesActivity.this,WriteDynamicActivity.class);
+                startActivity(intent);
+
             }
         });
 

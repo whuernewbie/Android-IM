@@ -133,7 +133,8 @@ public class InfoChangeActivity extends BaseActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO 圆形控件点击事件处理
+                Intent intent=new Intent(InfoChangeActivity.this,WriteDynamicActivity.class);
+                startActivity(intent);
             }
         });
 

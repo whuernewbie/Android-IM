@@ -8,6 +8,9 @@ import java.util.List;
 
 public class FakeDataUtil {
     public static String SenderUid = "1000002";
+    public static String SenderImageUrl="0";
+    public static String uname="xiaohu";
+
     public static String GroupName="NewGroup";
     public static int MaxGroupNum=2000;
 
@@ -19,6 +22,8 @@ public class FakeDataUtil {
     public static final String FindGroupInfo=HttpAddress+"search&type=group&detail";
     public static final String FindUserInfo=HttpAddress+"search&type=user";
     public static final String UpdateUserInfo=HttpAddress+"update";
+    public static final String UploadDynamic=HttpAddress+"share&type=upload";
+    public static final String DownloadDynamic=HttpAddress+"share&type=fetch";
 
 
     public static  String[] removeArrayEmptyTextBackNewArray(String[] strArray) {

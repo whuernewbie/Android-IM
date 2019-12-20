@@ -16,13 +16,13 @@ public class GroupInfo extends DataSupport {
 
     private String owner;
 
-    private String [] person=new String[FakeDataUtil.MaxGroupNum];
+    private String person;
 
-    public String[] getPerson() {
+    public String getPerson() {
         return person;
     }
 
-    public void setPerson(String[] person) {
+    public void setPerson(String person) {
         this.person = person;
     }
 

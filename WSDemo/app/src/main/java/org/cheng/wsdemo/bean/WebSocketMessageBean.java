@@ -7,17 +7,17 @@ import java.util.Date;
 
 
 public class WebSocketMessageBean extends DataSupport {
-    private MESSAGETYPE msgType;
+    private String msgType;
     private String message;
     private String msgFrom;
     private String msgTo;
     private Date   date;
 
-    public MESSAGETYPE getMsgType() {
+    public String getMsgType() {
         return msgType;
     }
 
-    public void setMsgType(MESSAGETYPE msgType) {
+    public void setMsgType(String msgType) {
         this.msgType = msgType;
     }
 

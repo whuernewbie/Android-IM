@@ -155,8 +155,8 @@ public class MyWebSocket implements Runnable{
                                  ) {
                                 if(groupInfo.getGid().equals(addFriendsBean.getMsgTo()))
                                 {
-                                    String [] person=groupInfo.getPerson();
-                                    person[person.length]=addFriendsBean.getMsgFrom();
+                                    String person=groupInfo.getPerson();
+                                    person=person+","+addFriendsBean.getMsgFrom();
                                     groupInfo.setPerson(person);
                                     groupInfo.save();
                                 }
@@ -179,9 +179,8 @@ public class MyWebSocket implements Runnable{
                             groupInfo.setGname(FakeDataUtil.GroupName);
                             groupInfo.setOwner(FakeDataUtil.SenderUid);
                             groupInfo.setNumber(1);
-                            String [] person=new String[]{FakeDataUtil.SenderUid};
+                            String  person=FakeDataUtil.SenderUid;
                             groupInfo.setPerson(person);
-
                             groupInfo.save();
 
                             GroupListBean groupListBean=new GroupListBean();
@@ -254,7 +253,7 @@ public class MyWebSocket implements Runnable{
                 long thisBeatTime = new Date().getTime();
                 /** 消息实体 **/
                 WebSocketMessageBean webSocketMessageBean = new WebSocketMessageBean();
-                webSocketMessageBean.setMsgType(MESSAGETYPE.BEAT);
+                webSocketMessageBean.setMsgType(MESSAGETYPE.BEAT.toString());
                 /** 只能发送String **/
                 if(WebSocketService.webSocketConnection != null && WebSocketService.webSocketConnection.isConnected()){
                     WebSocketService.webSocketConnection.sendTextMessage(JSON.toJSONString(webSocketMessageBean));

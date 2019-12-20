@@ -26,6 +26,7 @@ import org.cheng.wsdemo.http.HttpUtil;
 import org.cheng.wsdemo.service.WebSocketService;
 import org.cheng.wsdemo.util.FakeDataUtil;
 import org.cheng.wsdemo.util.NoticeUtil;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
@@ -173,7 +174,15 @@ public class FriendRequestActivity extends AppCompatActivity {
                                         if(jsonObject.get("status").toString().equals("ok"))
                                         {
                                             JSONObject jsonObject1 =new JSONObject(jsonObject.get("groupInfo").toString());
-                                            GroupInfo groupInfo=JSON.parseObject(jsonObject1.get("groupInfo").toString(),new TypeReference<GroupInfo>(){});
+                                            GroupInfo  groupInfo   =JSON.parseObject(jsonObject1.get("groupInfo").toString(),new TypeReference<GroupInfo>(){});
+                                            JSONArray  json =new JSONArray(jsonObject.get("person").toString());
+                                            String person=new String();
+                                            for(int i=0;i<json.length();i++)
+                                            {
+                                                person+=json.get(i).toString()+",";
+                                            }
+                                            person+=FakeDataUtil.SenderUid;
+                                            groupInfo.setPerson(person);
                                             groupInfo.save();
                                             System.out.println(jsonObject.toString());
                                         }

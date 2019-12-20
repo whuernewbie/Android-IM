@@ -17,6 +17,7 @@ import com.alibaba.fastjson.JSON;
 
 import org.cheng.wsdemo.R;
 import org.cheng.wsdemo.adapter.MsgAdapter;
+import org.cheng.wsdemo.bean.GroupInfo;
 import org.cheng.wsdemo.bean.Msgbean;
 import org.cheng.wsdemo.bean.UserInfo;
 import org.cheng.wsdemo.bean.WebSocketMessageBean;
@@ -85,16 +86,33 @@ public class MessageActivity extends AppCompatActivity {
         public void mySystemMethod(JSONObject jsonObject) {
             System.out.println(jsonObject.toString());
             try {
-                if (jsonObject.get("msgTo").toString().equals(rid)&&!jsonObject.get("msgFrom").toString().equals(FakeDataUtil.SenderUid)) {
-                    Msgbean msg = new Msgbean(jsonObject.get("message").toString(), Msgbean.TYPE_RECEIVED);
+                if(jsonObject.get("msgType").toString().equals(MESSAGETYPE.GROUPCHAT.toString()))
+                {
+                    if (jsonObject.get("msgTo").toString().equals(rid)&&!jsonObject.get("msgFrom").toString().equals(FakeDataUtil.SenderUid)) {
+                        Msgbean msg = new Msgbean(jsonObject.get("message").toString(), Msgbean.TYPE_RECEIVED);
 
-                    msg.setId(jsonObject.get("msgFrom").toString());
-                    msg.setName(jsonObject.get("msgFrom").toString());
+                        msg.setId(jsonObject.get("msgFrom").toString());
+                        msg.setName(jsonObject.get("msgFrom").toString());
 
-                    msgList.add(msg);
-                    adapter.notifyItemInserted(msgList.size() - 1); // 当有新消息时，刷新ListView中的显示
-                    msgRecyclerView.scrollToPosition(msgList.size() - 1); // 将ListView定位到最后一行
+                        msgList.add(msg);
+                        adapter.notifyItemInserted(msgList.size() - 1); // 当有新消息时，刷新ListView中的显示
+                        msgRecyclerView.scrollToPosition(msgList.size() - 1); // 将ListView定位到最后一行
+                    }
                 }
+                else if(jsonObject.get("msgType").toString().equals(MESSAGETYPE.USERCHAT.toString()))
+                {
+                    if (jsonObject.get("msgFrom").toString().equals(rid)&&jsonObject.get("msgTo").toString().equals(FakeDataUtil.SenderUid)) {
+                        Msgbean msg = new Msgbean(jsonObject.get("message").toString(), Msgbean.TYPE_RECEIVED);
+
+                        msg.setId(jsonObject.get("msgFrom").toString());
+                        msg.setName(jsonObject.get("msgFrom").toString());
+
+                        msgList.add(msg);
+                        adapter.notifyItemInserted(msgList.size() - 1); // 当有新消息时，刷新ListView中的显示
+                        msgRecyclerView.scrollToPosition(msgList.size() - 1); // 将ListView定位到最后一行
+                    }
+                }
+
 
             } catch (JSONException e) {
                 //TODO JSON格式转换错误
@@ -109,7 +127,7 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_inputmsg);
         mContext = MessageActivity.this;
 
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         rid = intent.getStringExtra(msgTo);
         rname = intent.getStringExtra(name);
         chatType=intent.getStringExtra(msgType);
@@ -129,6 +147,17 @@ public class MessageActivity extends AppCompatActivity {
         msgRecyclerView.setAdapter(adapter);
 
 
+        setInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(chatType.equals(MESSAGETYPE.GROUPCHAT.toString()))
+                {
+                    Intent intent1=new Intent(mContext, GroupInfoActivity.class);
+                    intent1.putExtra(GroupInfoActivity.groupId,rid);
+                    startActivity(intent1);
+                }
+            }
+        });
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -151,7 +180,7 @@ public class MessageActivity extends AppCompatActivity {
                             //建立消息体类
                             WebSocketMessageBean webSocketMessageBean = new WebSocketMessageBean();
                             //消息类型
-                            webSocketMessageBean.setMsgType(MESSAGETYPE.valueOf(chatType));
+                            webSocketMessageBean.setMsgType(chatType);
                             //用户ID
                             webSocketMessageBean.setMsgFrom(FakeDataUtil.SenderUid);
                             //接收方Id
@@ -188,16 +217,43 @@ public class MessageActivity extends AppCompatActivity {
      */
 
     private void initMsgs() {
-        List<WebSocketMessageBean> webSocketMessageBeans = DataSupport.where("(msgFrom=? AND msgTo=?)or(msgFrom=? AND msgTo=?)", FakeDataUtil.SenderUid, rid, rid, FakeDataUtil.SenderUid).order("id asc").find(WebSocketMessageBean.class);
-        for (WebSocketMessageBean wb : webSocketMessageBeans
-        ) {
-            if (wb.getMsgTo().toString().equals(FakeDataUtil.SenderUid)) {
-                Msgbean msg1 = new Msgbean(wb.getMessage().toString(), Msgbean.TYPE_RECEIVED);
-                msgList.add(msg1);
-            } else if (wb.getMsgTo().toString().equals(rid)) {
-                Msgbean msg1 = new Msgbean(wb.getMessage().toString(), Msgbean.TYPE_SENT);
-                msgList.add(msg1);
+        if(chatType.equals(MESSAGETYPE.USERCHAT.toString()))
+        {
+            List<WebSocketMessageBean> webSocketMessageBeans = DataSupport.where("(msgFrom=? AND msgTo=?)or(msgFrom=? AND msgTo=?)", FakeDataUtil.SenderUid, rid, rid, FakeDataUtil.SenderUid).order("id asc").find(WebSocketMessageBean.class);
+            for (WebSocketMessageBean wb : webSocketMessageBeans
+            ) {
+                if (wb.getMsgTo().toString().equals(FakeDataUtil.SenderUid)) {
+                    Msgbean msg1 = new Msgbean(wb.getMessage().toString(), Msgbean.TYPE_RECEIVED);
+                    msg1.setId(wb.getMsgFrom());
+                    msg1.setName("");
+                    msgList.add(msg1);
+                } else if (wb.getMsgTo().toString().equals(rid)) {
+                    Msgbean msg1 = new Msgbean(wb.getMessage().toString(), Msgbean.TYPE_SENT);
+                    msg1.setId(wb.getMsgFrom());
+                    msg1.setName("");
+                    msgList.add(msg1);
+                }
             }
         }
+        else if(chatType.equals(MESSAGETYPE.GROUPCHAT.toString()))
+        {
+            List<WebSocketMessageBean> webSocketMessageBeans=DataSupport.where("msgTo = ?",rid).order("id asc").find(WebSocketMessageBean.class);
+            for (WebSocketMessageBean wb : webSocketMessageBeans
+            ) {
+                if (wb.getMsgFrom().equals(FakeDataUtil.SenderUid)) {
+                    Msgbean msg1 = new Msgbean(wb.getMessage().toString(), Msgbean.TYPE_SENT);
+                    msg1.setId(wb.getMsgFrom());
+                    msg1.setName("");
+                    msgList.add(msg1);
+                } else
+                    {
+                    Msgbean msg1 = new Msgbean(wb.getMessage(), Msgbean.TYPE_SENT);
+                    msg1.setId(wb.getMsgFrom());
+                    msg1.setName("");
+                    msgList.add(msg1);
+                }
+            }
+        }
+
     }
 }

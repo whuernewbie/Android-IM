@@ -1,6 +1,9 @@
 package org.cheng.wsdemo.http;
 
+import org.cheng.wsdemo.bean.DynamicBean;
 import org.cheng.wsdemo.bean.UserInfo;
+
+import java.lang.reflect.Field;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -66,6 +69,59 @@ public class HttpUtil {
         Request request=new Request.Builder()
                 .url(address)
                 .post(formBody.build())
+                .build();
+        client.newCall(request).enqueue(callback);
+    }
+
+    public static void postUploadDynamic(final String address, DynamicBean dynamicBean, final okhttp3.Callback callback)
+    {
+        FormBody.Builder formBody=new FormBody.Builder();
+        Field[] fields=dynamicBean.getClass().getDeclaredFields();
+        for (int i=0;i<fields.length;i++)
+        {
+            String varName=fields[i].getName();
+            try
+            {
+                boolean access=fields[i].isAccessible();
+                fields[i].setAccessible(true);
+                Object obj;
+                try
+                {
+                    obj=fields[i].get(dynamicBean);
+                    formBody.add(varName,obj.toString());
+
+                }catch (IllegalAccessException e)
+                {
+                    e.printStackTrace();
+                }
+
+                fields[i].setAccessible(access);
+            }catch (IllegalArgumentException ex)
+            {
+                ex.printStackTrace();
+            }
+
+        }
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder()
+                .url(address)
+                .post(formBody.build())
+                .build();
+        client.newCall(request).enqueue(callback);
+    }
+
+    public static void DownloadDynamic(final String address,String uid,double x,double y,int start,int end,final okhttp3.Callback callback)
+    {
+        OkHttpClient client = new OkHttpClient();//创建OkHttpClient对象。
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("uid",uid);//传递键值对参数
+        formBody.add("locationx",""+x);
+        formBody.add("locationy",""+y);
+        formBody.add("start",""+start);
+        formBody.add("end",""+end);
+        Request request = new Request.Builder()//创建Request 对象。
+                .url(address)
+                .post(formBody.build())//传递请求体
                 .build();
         client.newCall(request).enqueue(callback);
     }

@@ -11,10 +11,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.DynamicShowActivity"></activity>
-
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="5OsS6SlKnwoyoOn96B2G6hd8Hewjc8GC" />
+        <activity android:name=".ui.GroupInfoActivity"></activity>
+        <activity android:name=".ui.WriteDynamicActivity" />
+        <activity android:name=".ui.DynamicShowActivity" />
         <activity android:name=".ui.InfoChangeActivity" />
-
         <activity android:name=".ui.CreatGroupActivity" />
         <activity android:name=".ui.GroupActivity" />
         <activity android:name=".ui.FriendsActivity" />
@@ -33,19 +36,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service android:name=".service.WebSocketService" />
+        <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote"></service>
 
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
-
         <uses-library
             android:name="com.google.android.things"
             android:required="false" />
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
 </manifest>

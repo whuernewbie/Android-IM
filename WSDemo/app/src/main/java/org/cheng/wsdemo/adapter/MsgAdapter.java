@@ -37,6 +37,10 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
 
         TextView rightMsg;
 
+        TextView leftName;
+
+        TextView rightName;
+
         public ViewHolder(View view) {
             super(view);
             leftLayout = (LinearLayout) view.findViewById(R.id.left_layout);
@@ -45,6 +49,8 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
             rightMsg = (TextView) view.findViewById(R.id.right_msg);
             leftImage=(CircleImageView)view.findViewById(R.id.left_head_image);
             rightImage=(CircleImageView)view.findViewById(R.id.right_head_image);
+            leftName=(TextView)view.findViewById(R.id.left_name);
+            rightName=(TextView)view.findViewById(R.id.right_name);
         }
     }
 
@@ -85,11 +91,13 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
             holder.leftLayout.setVisibility(View.VISIBLE);
             holder.rightLayout.setVisibility(View.GONE);
             holder.leftMsg.setText(msg.getContent());
+            holder.leftName.setText(msg.getName()+msg.getId());
         } else if(msg.getType() == Msgbean.TYPE_SENT) {
             // 如果是发出的消息，则显示右边的消息布局，将左边的消息布局隐藏
             holder.rightLayout.setVisibility(View.VISIBLE);
             holder.leftLayout.setVisibility(View.GONE);
             holder.rightMsg.setText(msg.getContent());
+            holder.rightName.setText(msg.getName()+msg.getId());
         }
     }
 

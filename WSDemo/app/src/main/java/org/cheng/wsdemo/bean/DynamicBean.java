@@ -1,11 +1,24 @@
 package org.cheng.wsdemo.bean;
 
-public class DynamicBean {
+import org.litepal.crud.DataSupport;
+
+public class DynamicBean extends DataSupport implements Comparable<DynamicBean>{
     private String uid;
 
     private String uname;
 
     private String headImageUrl;
+
+    private String content;
+
+    private String address;
+
+    private double locationx;
+
+    private double locationy;
+
+    private String time;
+
 
     public String getUname() {
         return uname;
@@ -23,13 +36,6 @@ public class DynamicBean {
         this.headImageUrl = headImageUrl;
     }
 
-    private String context;
-
-    private String address;
-
-    private double loactionx;
-
-    private double loactiony;
 
     public String getUid() {
         return uid;
@@ -39,12 +45,12 @@ public class DynamicBean {
         this.uid = uid;
     }
 
-    public String getContext() {
-        return context;
+    public String getContent() {
+        return content;
     }
 
-    public void setContext(String context) {
-        this.context = context;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public String getAddress() {
@@ -55,19 +61,40 @@ public class DynamicBean {
         this.address = address;
     }
 
-    public double getLoactionx() {
-        return loactionx;
+    public double getLocationx() {
+        return locationx;
     }
 
-    public void setLoactionx(double loactionx) {
-        this.loactionx = loactionx;
+    public void setLocationx(double locationx) {
+        this.locationx = locationx;
     }
 
-    public double getLoactiony() {
-        return loactiony;
+    public double getLocationy() {
+        return locationy;
     }
 
-    public void setLoactiony(double loactiony) {
-        this.loactiony = loactiony;
+    public void setLocationy(double locationy) {
+        this.locationy = locationy;
     }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    @Override
+    public int compareTo(DynamicBean dynamicBean)
+    {
+        if(dynamicBean.getTime()==null||this.time==null)
+        {
+            return 0;
+        }
+        int a=Integer.valueOf(this.time).intValue();
+        int b=Integer.valueOf(dynamicBean.time).intValue();
+        return b-a;
+    }
+
 }

@@ -35,16 +35,16 @@ public class DynamicAdapter extends RecyclerView.Adapter<DynamicAdapter.ViewHold
         ImageView userImage;
         TextView  name;
 
-        TextView context;
+        TextView content;
         TextView location;
 
         public ViewHolder(View view) {
             super(view);
             cardView = (CardView) view;
-            context=(TextView) view.findViewById(R.id.context);
+            content=(TextView) view.findViewById(R.id.content);
             location=(TextView) view.findViewById(R.id.location);
             userImage = (ImageView) view.findViewById(R.id.image);
-            name = (TextView) view.findViewById(R.id.name);
+            name = (TextView) view.findViewById(R.id.uname);
         }
     }
 
@@ -81,7 +81,7 @@ public class DynamicAdapter extends RecyclerView.Adapter<DynamicAdapter.ViewHold
     public void onBindViewHolder(ViewHolder holder, int position) {
         DynamicBean dynamicBean = DynamicList.get(position);
 
-        holder.context.setText(dynamicBean.getContext());
+        holder.content.setText(dynamicBean.getContent());
         holder.location.setText(dynamicBean.getAddress());
         holder.name.setText(dynamicBean.getUname());
         Glide.with(mContext).load(dynamicBean.getHeadImageUrl()).into(holder.userImage);
