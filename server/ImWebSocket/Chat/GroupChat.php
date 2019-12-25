@@ -6,6 +6,7 @@ namespace ImWebSocket\Chat;
 
 use Common\Mysql;
 use Common\Redis;
+use Log\WsLog;
 use Tools\Sql;
 
 class GroupChat extends Message
@@ -13,17 +14,17 @@ class GroupChat extends Message
 
     public function run()
     {
-        $this->group_push();
+        $this->groupPush();
     }
 
     /**
      * 群聊推送给所有在线 用户
      */
-    private function group_push()
+    private function groupPush()
     {
         $redis = (new Redis())->getInstance();
 
-        $msg    = json_decode($this->data);
+        $msg = json_decode($this->data);
 
         // 群号
         $gid = $msg->{MessageField::TO};
@@ -48,13 +49,13 @@ class GroupChat extends Message
 
         // 后台保存到数据库
 
-        $this->msg_mysql();
+        $this->msgToMysql();
     }
 
     /**
      * 群聊消息 存入数据库
      */
-    private function msg_mysql()
+    private function msgToMysql()
     {
 
         // 拿到群号 与 发送者 id
@@ -65,15 +66,20 @@ class GroupChat extends Message
         // 准备语句 插入数据库
         $mysql = (new Mysql())->getInstance();
         $sql   = (new Sql())
-            ->setTable(WsMysql::GROUP_TABLE_PREFIX . $gid)       // 群聊表
+            ->setTable(WsMysql::GROUP_TABLE_PREFIX . $gid)// 群聊表
             ->insert(
                 [
-                    'mid'  => null,                 // 消息 id 自增
-                    'from_uid' => $from,            // 发送者
-                    'msg'  => $this->data,          // 消息体
+                    'mid'     => null,                 // 消息 id 自增
+                    'msgFrom' => $from,                // 发送者
+                    'msg'     => $this->data,          // 消息体
                 ]
             )
             ->getSql();
-        $mysql->exec($sql);
+        // 群聊消息 离线 到 mysql
+        try {
+            $mysql->exec($sql);
+        } catch (\PDOException $e) {
+            WsLog::log($e->getTraceAsString());
+        }
     }
 }

@@ -14,11 +14,11 @@ interface MessageType
     /**
      * 单聊
      */
-    const SINGLE_CHAT = 'SingleChat';
+    const SINGLE_CHAT = 'USERCHAT';
     /**
      * 群聊
      */
-    const GROUP_CHAT = 'GroupChat';
+    const GROUP_CHAT = 'GROUPCHAT';
     /**
      * 好友申请
      */
@@ -28,7 +28,17 @@ interface MessageType
      */
     const GROUP_REQUEST = 'GroupReq';
     /**
+     * 创建群聊
+     */
+    const GROUP_CREATE = 'GroupCreate';
+
+    /**
+     * 群聊邀请
+     */
+    const GROUP_INVITE = 'GroupInvite';
+
+    /**
      * 心跳
      */
-    const HEART_BEAT = 'Beat';
+    const HEART_BEAT = 'BEAT';
 }

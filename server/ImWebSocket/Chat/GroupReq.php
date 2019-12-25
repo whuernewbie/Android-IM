@@ -20,19 +20,6 @@ class GroupReq extends Message
         'refuse',
     ];
 
-    /**
-     * @var \PDO|null
-     */
-    private $mysql;
-    /**
-     * @var Sql
-     */
-    private $sql;
-    /**
-     * @var \Redis
-     */
-    private $redis;
-
     public function run()
     {
         // 获取加群 申请 同意 类型
@@ -232,14 +219,5 @@ class GroupReq extends Message
         $query = 'update `' . WsMysql::GROUP_INFO_TABLE . '` set `person_number` = `person_number` + 1 where `gid` = ' . $gid;
 
         $this->mysql->exec($query);
-    }
-
-    /**
-     * 初始化 mysql 句柄
-     */
-    private function init()
-    {
-        $this->mysql = (new Mysql())->getInstance();
-        $this->sql   = new Sql();
     }
 }

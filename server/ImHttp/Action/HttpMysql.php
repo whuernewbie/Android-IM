@@ -63,4 +63,14 @@ interface HttpMysql
      * 群聊 用户关系表
      */
     const GROUP_USER_TABLE = 'group_person';
+
+    /**
+     * 私聊关系表
+     */
+    const PRI_MSG_TABLE = 'pri_msg';
+
+    /**
+     * 动态表
+     */
+    const SHARE_TABLE = 'share';
 }

@@ -3,6 +3,7 @@
 
 namespace ImHttp\Action;
 
+use Log\HttpLog;
 use Swoole\Http\Server;
 use Swoole\Http\Response;
 use Swoole\Http\Request;
@@ -50,6 +51,7 @@ class Gateway
      */
     public function run()
     {
+        HttpLog::log(json_encode($this->req));
         // 非指定动作 不处理
         if (empty($this->req->get['action'])) {
             $this->notice(['status' => 'error', 'msg' => 'no action']);
@@ -57,6 +59,12 @@ class Gateway
             return;
         }
         $action = $this->req->get['action'];
+
+        if ('im' === $action) {
+            $this->res->header('Content-Type', 'text/html');
+            $path = __DIR__ . '/../im.php';
+            $this->res->end(`php $path`);
+        }
 
         // 找到对应 api 提供服务
         if (in_array($action, self::$api, true)) {

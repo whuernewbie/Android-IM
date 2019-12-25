@@ -4,6 +4,7 @@ namespace Common;
 
 /*
  * pdo 方式下 localhost 会自动选择 sock  127.0.0.1 会选择 tcp/ip 方式
+ * 所以 win 下 pdo 不能使用 localhost
  * 不同于 mysqli
  *
 */

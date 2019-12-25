@@ -26,8 +26,8 @@ class Search extends Action
      */
     private const PRIVATE_KEY = [
         'password',
-        'email',
-        'create_time',
+//        'email',
+        'createTime',
     ];
 
     /**
@@ -46,7 +46,7 @@ class Search extends Action
                     $this->gateway->notice(['status' => 'error', 'msg' => 'no gid']);
                     break;
                 }
-                $bool = isset($this->post['detail']);
+                $bool = isset($this->get['detail']);
                 $this->getGroupInfo($this->post['gid'], $bool);
                 break;
             default:

@@ -247,4 +247,15 @@ class Sql
     {
         return $this->getSql();
     }
+
+    /**
+     * @param \PDO $mysql
+     * @param $result
+     * 用于 安全执行 sql 语句
+     */
+//    public static function exec(\PDO $mysql, &$result) {
+//        try {
+//
+//        }
+//    }
 }

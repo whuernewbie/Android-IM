@@ -4,6 +4,7 @@
 namespace ImHttp\Action;
 
 use Common\Mysql;
+use Log\HttpLog;
 use Tools\Sql;
 
 
@@ -20,12 +21,13 @@ class Update extends Action
      * 可修改字段
      */
     private const VALID_FIELD = [
-        'uname'     => null,
-        'password'  => null,
-        'email'     => null,
-        'sex'       => null,
-        'age'       => null,
-        'more_info' => null,
+        'uname'    => null,
+        'password' => null,
+        'email'    => null,
+        'sex'      => null,
+        'age'      => null,
+        'imageUrl' => null,
+        'moreInfo' => null,
     ];
 
     /**
@@ -37,13 +39,12 @@ class Update extends Action
         if (empty($this->post['uid'])) {
             $this->gateway->notice(['status' => 'error', 'msg' => 'no uid']);
             return;
-        }
-        else {
+        } else {
             // 过滤 post 中键值不在 VALID_FIELD 中的数据
             $new_info = array_intersect_key($this->post, self::VALID_FIELD);
 
-            $mysql  = (new Mysql())->getInstance();
-            $sql    = new Sql();
+            $mysql = (new Mysql())->getInstance();
+            $sql   = new Sql();
             $query = $sql
                 ->setTable(HttpMysql::USER_TABLE)
                 ->select(['*'])
@@ -57,25 +58,26 @@ class Update extends Action
                 $this->gateway->notice(['status' => 'error', 'msg' => '用户不存在']);
 
                 return;
-            }
-            else {
+            } else {
                 // 更新信息
                 $query = $sql
                     ->setTable(HttpMysql::USER_TABLE)
                     ->update($new_info)
                     ->whereAnd(['uid', '=', $this->post['uid']])
                     ->getSql();
-                $ok = $mysql->exec($query);
 
-                // 返回 受影响 行数 ok = 1  修改成功 ok = 0 失败
-                // ok = 0 信息没有更新
+                try {
+
+                    $mysql->exec($query);
+                    $this->gateway->notice(['status' => 'ok', 'msg' => '修改成功']);
+
+                } catch (\PDOException $e) {
+
+                    HttpLog::log($e->getTraceAsString());
+                    $this->gateway->notice(['status' => 'error', 'msg' => '修改失败']);
+                    return;
+                }
                 // TODO: 前台保证 更新的信息与 旧信息不同
-                $this->gateway->notice(
-                    [
-                        'status' => $ok ? 'ok' : 'error',
-                        'msg'    => $ok ? '修改成功' : '修改失败',
-                    ]
-                );
             }
         }
 
@@ -97,6 +99,5 @@ class Update extends Action
         }
 
         return true;
-
     }
 }

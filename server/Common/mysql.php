@@ -26,7 +26,7 @@ class Mysql {
             // 设置 pdo 错误为 抛出异常 便于调试
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             // 设置 数据库字段为小写
-            $this->pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
+//            $this->pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
         } catch (\PDOException $e) {
             echo 'pdo connect mysql fail ' . $e->getMessage() . PHP_EOL;
         }

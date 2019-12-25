@@ -3,6 +3,7 @@
 
 namespace ImWebSocket\Chat;
 
+use Log\WsLog;
 use Swoole\Http\Request;
 use \Swoole\WebSocket\Server as WebSocket;
 use \Swoole\WebSocket\Frame;
@@ -29,8 +30,6 @@ final class Event
                 ))
                 ->getConstants();
 
-            var_dump(self::$message_type);
-
         } catch (\Exception $e) {
             echo $e->getMessage() . PHP_EOL;
         }
@@ -45,6 +44,7 @@ final class Event
     {
         // url 中不含 uid 关闭连接
         if (empty($req->get[self::GET_UID])) {
+
             $ws->push($req->fd, json_encode(['status' => 'error']));
             $ws->close($req->fd);
             return;
@@ -73,24 +73,20 @@ final class Event
     public static function message(WebSocket $ws, Frame $frame) {
 
         $msg = json_decode($frame->data);
+
         $type = @$msg->{MessageField::TYPE};
 
-        if ('BEAT' === $msg->{'messageType'}) {
-            return;
-        }
+        MessageType::HEART_BEAT !== $type and WsLog::log($frame->data);     // log 消息 (除了 beat)
 
         // 不存在 对应 type 关闭连接
         if (!in_array($type, self::$message_type, true)) {
-            $ws->push(
-                $frame->fd,
-                json_encode(['status' => 'error', 'msg' => 'no type'])
-                );
-            $ws->close($frame->fd);
 
+            $ws->push($frame->fd, json_encode(['status' => 'error', 'msg' => 'type error']));
+            $ws->close($frame->fd);
             return;
         } else {
-            $class_name = __NAMESPACE__ . '\\' . $type;
 
+            $class_name = __NAMESPACE__ . '\\' . $type;
             (new $class_name($ws, $frame));
         }
     }

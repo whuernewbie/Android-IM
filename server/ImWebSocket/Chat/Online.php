@@ -5,7 +5,6 @@ namespace ImWebSocket\Chat;
 
 use Common\Mysql;
 use Common\Redis;
-use Log\Log;
 use Log\WsLog;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Server;
@@ -78,18 +77,27 @@ final class Online
      */
     private function run()
     {
+        // 初始化句柄
+        $this->initReuse();
+
+        // 判断 uid 真实性
+        if (!$this->checkUser()) {
+            $this->ws->push($this->fd, json_encode(['status' => 'error', 'msg' => 'no uid']));
+            return;
+        }
+
         if (isset($this->req->get['new'])) {
-            $this->new_device();
+            $this->newDevice();
         }
         else {
-            $this->old_device();
+            $this->oldDevice();
         }
     }
 
     /**
      * 用户 信息 绑定 到 redis
      */
-    private function user_bind()
+    private function userBind()
     {
         $redis = $this->redis;
         /**
@@ -110,9 +118,9 @@ final class Online
     /**
      * mysql 群聊信息缓存到 redis 中
      */
-    private function mysql_redis()
+    private function mysqlRedis()
     {
-        $this->user_bind();
+        $this->userBind();
         // 当前用户没有 群聊 不处理
         if (empty($this->gid_msg)) {
 
@@ -168,7 +176,7 @@ final class Online
     /**
      * 获取 未读私聊消息
      */
-    private function pri_msg(): array
+    private function priMsg(): array
     {
         $query   = $this->sql
             ->setTable(WsMysql::PRI_MSG)
@@ -179,7 +187,7 @@ final class Online
             )
             ->whereAnd(
                 [
-                    'to_uid', '=', $this->uid
+                    'msgTo', '=', $this->uid
                 ]
             )
             ->getSql();
@@ -199,7 +207,7 @@ final class Online
             ->select(
                 [
                     'gid',                          // 群号
-                    'last_msg_id',                  // 最大 msg id
+                    'lastMsgId',                  // 最大 msg id
                 ]
             )
             ->whereAnd(['uid', '=', $this->uid])
@@ -209,7 +217,7 @@ final class Online
         $groups = $this->mysql->query($query)->fetchAll();
 
         // 调换索引结构 形成 gid <=> mid 结构
-        $this->gid_msg = array_column($groups, 'last_msg_id', 'gid');
+        $this->gid_msg = array_column($groups, 'lastMsgId', 'gid');
         $this->groups  = array_keys($this->gid_msg);
         return $this->groups;
     }
@@ -217,7 +225,7 @@ final class Online
     /**
      * @return array 返回离线消息
      */
-    private function group_msg(): array
+    private function groupMsg(): array
     {
         $msg = [];
         // 循环取回每个 群的离线消息 再组合
@@ -227,13 +235,14 @@ final class Online
                 ->setTable($group_table)
                 ->select(
                     [
-                        'msg',
+                        'msg', 'mid'
                     ]
                 )
                 ->whereAnd(['mid', '>', $mid])
                 ->getSql();
             $result               = $this->mysql->query($query)->fetchAll();
-            $msg['group_' . $gid] = $result;
+
+            $msg = array_merge($msg, $result);
         }
 
         return $msg;
@@ -242,13 +251,12 @@ final class Online
     /**
      * 构造 mysql redis sql 供后续函数使用
      */
-    private function init_reuse(): void
+    private function initReuse()
     {
         $this->mysql = (new Mysql())->getInstance();
         $this->sql   = new Sql();
-        $this->redis = (new Redis())->getInstance();
 
-        return;
+        $this->redis = (new Redis())->getInstance();
     }
 
     /**
@@ -256,9 +264,8 @@ final class Online
      * 1. 拿到所有 好友 以及 群组 信息
      * 2. 拿到所有离线消息
      */
-    private function new_device()
+    private function newDevice()
     {
-        $this->init_reuse();
         /**
          * 考虑 用户上线
          */
@@ -266,17 +273,17 @@ final class Online
         // 好友 info 处理
         $friends                   = $this->getFriend();
         $this->msg['friends']      = $friends;
-        $this->msg['friends_info'] = $this->getFriendsInfo($friends);
+        $this->msg['friendsInfo'] = $this->getFriendsInfo($friends);
         // 群聊 info 处理
         $groups                   = $this->getGroups();
         $this->msg['groups']      = $groups;
-        $this->msg['groups_info'] = $this->getGroupsInfo($groups);
+        $this->msg['groupsInfo'] = $this->getGroupsInfo($groups);
 
         // 好友 offline message 处理
-        $this->msg['offline_message'] = $this->pri_msg(); // 因为包含 好友申请信息 这样命名比较合适
+        $msg = $this->priMsg(); // 因为包含 好友申请信息 这样命名比较合适
 
         // 群聊 offline message 处理
-        $this->msg['groups_message'] = $this->group_msg();
+        $this->msg['offline_message'] = array_merge($msg, $this->groupMsg());
 
         $this->push();
     }
@@ -285,16 +292,15 @@ final class Online
      * 非 新设备登录
      * 只需要推送离线消息即可
      */
-    private function old_device() {
-        $this->init_reuse();
+    private function oldDevice() {
 
         // 好友 offline message 处理
-        $this->msg['offline_message'] = $this->pri_msg(); // 因为包含 好友申请信息 这样命名比较合适
+        $msg = $this->priMsg(); // 因为包含 好友申请信息 这样命名比较合适
 
         // 获取 群聊 离线消息前 需要获取 群聊信息
         $this->getGroups();
         // 群聊 offline message 处理
-        $this->msg['groups_message'] = $this->group_msg();
+        $this->msg['offline_message'] = array_merge($msg, $this->groupMsg());
 
         $this->push();
     }
@@ -317,8 +323,8 @@ final class Online
             // 失败说明用户掉线 不处理即可
 
             if ($ok) {
-                $this->mysql_redis();
-                $this->delete_pri_msg();
+                $this->mysqlRedis();
+                $this->deletePriMsg();
             }
         }
     }
@@ -332,13 +338,13 @@ final class Online
     {
         // 见 http 模块 search api
         static $private_key = [
-            'create_time',
-            'email',
+            'createTime',
+//            'email',
             'password',
         ];
         // 这里使用 原生语句 pdo prepare
 
-        $query = 'select `*` from ' . WsMysql::USER_INFO_TABLE . ' where `uid` = ?';
+        $query = 'select `*` from `' . WsMysql::USER_INFO_TABLE . '` where `uid` = ?';
         $sql   = $this->mysql->prepare($query);
 
         $info = [];
@@ -367,7 +373,7 @@ final class Online
     private function getGroupsInfo(array $groups): array
     {
         $info  = [];
-        $query = 'select `*` from ' . WsMysql::GROUP_INFO_TABLE . ' where `gid` = ?';
+        $query = 'select `*` from `' . WsMysql::GROUP_INFO_TABLE . '` where `gid` = ?';
 
         $sql = $this->mysql->prepare($query);
         foreach ($groups as $group) {
@@ -381,7 +387,7 @@ final class Online
     /**
      * 用户上线接收到 离线消息后 删除离线消息
      */
-    private function delete_pri_msg()
+    private function deletePriMsg()
     {
         // 在 pri_msg 表中找到 所有 to_uid 为 uid 的消息 删除
         $query = $this->sql
@@ -389,11 +395,31 @@ final class Online
             ->delete()
             ->whereAnd(
                 [
-                    'to_uid', '=', $this->uid,
+                    'msgTo', '=', $this->uid,
                 ]
             )
             ->getSql();
         $this->mysql->exec($query);
         WsLog::log(__FILE__ . ' ' . __LINE__ . ' ' . $query);
+    }
+
+    /**
+     * 判断 uid 真实性
+     */
+    private function checkUser() {
+
+        $query = $this->sql
+            ->setTable(WsMysql::USER_INFO_TABLE)
+            ->select(
+                ['*']
+            )
+            ->whereAnd(
+                [
+                    'uid', '=', $this->uid,
+                ]
+            )
+            ->getSql();
+
+        return !empty($this->mysql->query($query)->fetch());
     }
 }

@@ -19,5 +19,6 @@ interface Api
     public const FILE     = 'file';
     public const UPDATE   = 'update';
     public const UPLOAD   = 'upload';
-    public const CREATE_GROUP = 'creategroup';
+    public const SHARE    = 'share';
+    //    public const CREATE_GROUP = 'creategroup';
 }

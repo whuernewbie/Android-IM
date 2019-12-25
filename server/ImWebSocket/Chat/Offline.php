@@ -64,7 +64,7 @@ class Offline
 
         $groups = array_keys($groups);
 
-        foreach ($groups as  $gid) {
+        foreach ($groups as $gid) {
             $redis->sRem(WsRedis::GROUP_PREFIX . $gid, $uid);
         }
 
@@ -92,7 +92,7 @@ class Offline
                 ->setTable(WsMysql::USER_GROUP_TABLE)
                 ->update(
                     [
-                        'last_msg_id' => $result,
+                        'lastMsgId' => $result,
                     ]
                 )
                 ->whereAnd(

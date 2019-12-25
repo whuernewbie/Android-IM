@@ -1,6 +1,9 @@
 <?php
 
 require_once __DIR__ . '/ws.php';
+
+require_once __DIR__ . '/Trait/UserInfo.php';
+
 require_once __DIR__ . '/Chat/MessageType.php';
 require_once __DIR__ . '/Chat/MessageField.php';
 require_once __DIR__ . '/Chat/WsRedis.php';
@@ -9,10 +12,14 @@ require_once __DIR__ . '/Chat/Event.php';
 require_once __DIR__ . '/Chat/Online.php';
 require_once __DIR__ . '/Chat/Offline.php';
 require_once __DIR__ . '/Chat/Message.php';
-require_once __DIR__ . '/Chat/SingleChat.php';
+require_once __DIR__ . '/Chat/UserChat.php';
 require_once __DIR__ . '/Chat/GroupChat.php';
+require_once __DIR__ . '/Chat/Beat.php';
 require_once __DIR__ . '/Chat/FriendReq.php';
 require_once __DIR__ . '/Chat/GroupReq.php';
+require_once __DIR__ . '/Chat/GroupCreate.php';
+require_once __DIR__ . '/Chat/GroupInvite.php';
+
 
 require_once __DIR__ . '/../Common/Mysql.php';
 require_once __DIR__ . '/../Common/Redis.php';
@@ -41,5 +48,4 @@ redis_init:
 /**
  * websocket start
  */
-echo 'ws start' . PHP_EOL;
 $ws->start();

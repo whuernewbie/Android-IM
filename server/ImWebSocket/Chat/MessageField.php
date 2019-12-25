@@ -25,5 +25,10 @@ interface MessageField
     /**
      *  消息内容 key
      */
-    const MSG = 'msg';
+    const MSG = 'message';
+
+    /**
+     * 子类型
+     */
+    const ACTION_TYPE = 'actionType';
 }

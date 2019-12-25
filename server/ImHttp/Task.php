@@ -60,7 +60,7 @@ final class Task
             HttpMysql::RESET_TABLE,
         ];
 
-        $time = \time() - HttpMysql::EXPIRE_TIME;
+        $time = \time();
         $sql = new Sql();
         $mysql = (new Mysql())->getInstance();
 
@@ -77,5 +77,13 @@ final class Task
             $mysql->exec($query);
         }
         HttpLog::log(__METHOD__ . ' ' . __LINE__ . ' clean expire verification code');
+    }
+
+    /**
+     * 定时清除日志
+     */
+    public static function cleanLog() {
+        $path = __DIR__ . '/../Log/log';
+        `cd $path && rm * -rf`;
     }
 }

@@ -29,7 +29,7 @@ class CreateGroup extends Action
     const CREATE_TABLE_SQL = <<<EOF
 create table `group_gid` (
 `mid` int primary key auto_increment COMMENT '消息 id, 自增',
-`from_uid` int not null COMMENT '发送者 id',
+`msgFrom` int not null COMMENT '发送者 id',
 `msg` text not null COMMENT '群聊消息'
 ) COMMENT = '群聊离线消息列表'
 EOF;

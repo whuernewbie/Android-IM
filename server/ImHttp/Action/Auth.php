@@ -43,7 +43,7 @@ class Auth extends Action
     /**
      * 密码重置认证
      */
-    private const RESET    = 'reset';
+    private const RESET = 'reset';
 
     /**
      * 密码重置认证 api 参数
@@ -60,11 +60,8 @@ class Auth extends Action
      */
     public function run()
     {
-        if (empty($this->get['type'])) {
-            $this->gateway->notice(['status' => 'error', 'msg' => 'no type']);
-            return;
-        }
-        switch ($this->get['type']) {
+        $type = @$this->get['type'];
+        switch ($type) {
             case self::REGISTER:
                 $this->register_auth();
                 break;
@@ -96,7 +93,7 @@ class Auth extends Action
         $email = $this->post['email'];      // 邮箱
         $mysql = (new Mysql())->getInstance();
 
-        $sql   = new Sql();
+        $sql = new Sql();
 
         $query = $sql
             ->setTable(HttpMysql::REGISTER_TABLE)
@@ -108,8 +105,8 @@ class Auth extends Action
 
         // 结果为空 即 注册表中没有此邮箱信息 终止
         if (empty($result)) {
-            $this->gateway->notice(['status' => 'error', 'msg' => '操作失败']);
 
+            $this->gateway->notice(['status' => 'error', 'msg' => '操作失败']);
             return;
         } else {
             // 对比 验证码
@@ -117,10 +114,10 @@ class Auth extends Action
             if ($auth === $this->post['auth']) {
                 // 移除 注册表中的信息
                 $query = $sql
-                        ->setTable(HttpMysql::REGISTER_TABLE)
-                        ->delete()
-                        ->whereAnd(['email', '=', $email])
-                        ->getSql();
+                    ->setTable(HttpMysql::REGISTER_TABLE)
+                    ->delete()
+                    ->whereAnd(['email', '=', $email])
+                    ->getSql();
 
                 $mysql->exec($query);
 
@@ -129,11 +126,11 @@ class Auth extends Action
                     ->setTable(HttpMysql::USER_TABLE)
                     ->insert(
                         [
-                            'uid'         => null,
-                            'uname'       => $this->post['uname'],
-                            'password'    => $this->post['password'],
-                            'email'       => $this->post['email'],
-                            'create_time' => 'unix_timestamp(now())',
+                            'uid'        => null,
+                            'uname'      => $this->post['uname'],
+                            'password'   => $this->post['password'],
+                            'email'      => $this->post['email'],
+                            'createTime' => 'unix_timestamp(now())',
                         ]
                     )
                     ->getSql();
@@ -145,9 +142,13 @@ class Auth extends Action
                  * 原因在于 多进程模式下，不能直接拿回 user 表的最大值 作为 uid
                  */
                 $query = $sql->setTable(HttpMysql::USER_TABLE)
-                        ->select(['uid'])
-                        ->whereAnd(['email', '=', $this->post['email']])
-                        ->getSql();
+                    ->select(['uid'])
+                    ->whereAnd(
+                        [
+                            'email', '=', $this->post['email']
+                        ]
+                    )
+                    ->getSql();
 
                 $result = $mysql->query($query)->fetch();
                 $uid    = $result['uid'];
@@ -157,16 +158,37 @@ class Auth extends Action
 
                 // 添加 客服管理员
                 $query = $sql
-                        ->setTable(HttpMysql::FRIEND_TABLE)
-                        ->insert(
-                            [
-                                'uid_1' => HttpMysql::SERVICE_ID,           // 客服 id
-                                'uid_2' => $uid,                            // 用户 id
-                                'remark_1_2' => $this->post['uname'],       // 用户名
-                                'remark_2_1' => HttpMysql::SERVICE_NAME,    // 客服
-                            ]
-                        )
-                        ->getSql();
+                    ->setTable(HttpMysql::FRIEND_TABLE)
+                    ->insert(
+                        [
+                            'uid_1'      => HttpMysql::SERVICE_ID,              // 客服 id
+                            'uid_2'      => $uid,                               // 用户 id
+                            'remark_1_2' => $this->post['uname'],               // 用户名
+                            'remark_2_1' => HttpMysql::SERVICE_NAME,            // 客服
+                        ]
+                    )
+                    ->getSql();
+
+                $mysql->exec($query);
+
+                // 插入欢迎消息
+                $query = $sql
+                    ->setTable(HttpMysql::PRI_MSG_TABLE)
+                    ->insert(
+                        [
+                            'msgTo'   => $uid,
+                            'msgFrom' => HttpMysql::SERVICE_ID,
+                            'msg'     => json_encode(
+                                [
+                                    'msgType' => 'USERCHAT',
+                                    'msgFrom' => HttpMysql::SERVICE_ID,
+                                    'msgTo'   => $uid,
+                                    'message' => HttpMysql::WELCOME,
+                                ]
+                            )
+                        ]
+                    )
+                    ->getSql();
 
                 $mysql->exec($query);
 
@@ -197,16 +219,16 @@ class Auth extends Action
             return;
         }
 
-        $sql = new Sql();
-        $query = $sql
-                ->setTable(HttpMysql::RESET_TABLE)
-                ->select(['auth'])
-                ->whereAnd(
-                    [
-                        'email', '=', $this->post['email'],
-                    ]
-                )
-                ->getSql();
+        $sql    = new Sql();
+        $query  = $sql
+            ->setTable(HttpMysql::RESET_TABLE)
+            ->select(['auth'])
+            ->whereAnd(
+                [
+                    'email', '=', $this->post['email'],
+                ]
+            )
+            ->getSql();
         $mysql  = (new Mysql())->getInstance();
         $result = $mysql->query($query)->fetch();
 
@@ -246,7 +268,6 @@ class Auth extends Action
     }
 
 
-
     /**
      * check api 参数完整性
      */
@@ -258,7 +279,8 @@ class Auth extends Action
     /**
      * register 参数检测
      */
-    private function register_check() {
+    private function register_check()
+    {
         foreach (self::REGISTER_KEY as $key) {
             if (empty($this->post[$key])) {
                 return $key;
@@ -272,7 +294,8 @@ class Auth extends Action
      * 重置密码 参数 检测
      * @return mixed
      */
-    private function reset_check() {
+    private function reset_check()
+    {
         foreach (self::RESET_KEY as $key) {
             if (empty($this->post[$key])) {
                 return $key;
@@ -285,7 +308,8 @@ class Auth extends Action
     /**
      * 注册时添加客服
      */
-    private function add_service() {
+    private function add_service()
+    {
 
     }
 }

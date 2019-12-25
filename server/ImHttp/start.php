@@ -16,12 +16,14 @@ require_once __DIR__ . '/Action/Mail.php';
 require_once __DIR__ . '/Action/File.php';
 require_once __DIR__ . '/Action/Upload.php';
 require_once __DIR__ . '/Action/CreateGroup.php';
+require_once __DIR__ . '/Action/Share.php';
 
 require_once __DIR__ . '/../Common/Mysql.php';
 require_once __DIR__ . '/../Common/Redis.php';
 require_once __DIR__ . '/../ImWebSocket/Chat/WsRedis.php';
 require_once __DIR__ . '/../Tools/Sql.php';
 require_once __DIR__ . '/../Log/Log.php';
+require_once __DIR__ . '/../Function/Worker.php';
 
 // api 初始化
 api_init:

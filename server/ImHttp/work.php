@@ -25,7 +25,7 @@ $server->set(
         'worker_num'            => 2,                   // worker 进程数量
         'task_worker_num'       => 1,                   // task  进程数量
         'task_enable_coroutine' => true,                // task 允许协程
-//        'daemonize'             => 1,                   // 启用守护进程
+        'daemonize'             => 1,                   // 启用守护进程
         'log_file'              => __DIR__ . '/../Log/http.log',    // 设置 log 文件
     ]
 );
@@ -64,7 +64,6 @@ $server->on('request', function (Request $req, Response $res) use ($server) {
 
 $server->on('close', function (Server $server, $fd, $reactor_id) {
     // do nothing
-    echo $fd . ' close' . PHP_EOL;
 });
 
 /*
@@ -97,6 +96,7 @@ $server->on('workerStart', function (Server $server) {
         // 第一个 worker 进程执行定时任务
         if ($server->worker_id === 0) {
             $server->tick(TIMER, ['\ImHttp\Task', 'time']);
+            $server->tick(TIMER * 60 * 24, ['\ImHttp\task', 'cleanLog']);
         }
     }
 
@@ -116,4 +116,3 @@ $server->on('Task', function (Server $server, \Swoole\Server\Task $task) {
 $server->on('finish', function (Server $server, $task_id, $data) {
     // do nothing
 });
-
