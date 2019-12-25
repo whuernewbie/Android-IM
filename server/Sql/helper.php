@@ -18,10 +18,10 @@ file_exists(__DIR__ . '/init.lock') and die('数据库已初始化，重新初�
 
 const HOST = 'localhost'; // win 下 使用 127.0.0.1 unix 下 使用 localhost 会使用 sock
 const PORT = 3306;
-const USER = 'root';
-const PASSWORD = 'root';
+const USER = '';
+const PASSWORD = '';
 const SOCK = '/var/lib/mysql/mysql.sock';
-const DB = 'ims';
+const DB = '';
 
 // 平台判断
 

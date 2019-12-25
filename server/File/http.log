@@ -1,8 +1,0 @@
-[2019-12-06 10:28:59 *317.0]	ERROR	php_swoole_server_rshutdown (ERRNO 503): Fatal error: Uncaught TypeError: Argument 1 passed to ImHttp\Action\Gateway::notice() must be of the type array, string given, called in /mnt/d/workspace/php/web/Swoole/Coroutine/ImHttp/Action/Register.php on line 79 and defined in /mnt/d/workspace/php/web/Swoole/Coroutine/ImHttp/Action/Gateway.php:80
-Stack trace:
-#0 /mnt/d/workspace/php/web/Swoole/Coroutine/ImHttp/Action/Register.php(79): ImHttp\Action\Gateway->notice('{"status":"ok",...')
-#1 /mnt/d/workspace/php/web/Swoole/Coroutine/ImHttp/Action/Gateway.php(62): ImHttp\Action\Register->run()
-#2 /mnt/d/workspace/php/web/Swoole/Coroutine/ImHttp/work.php(57): ImHttp\Action\Gateway->run()
-#3 {main}
-  thrown in /mnt/d/workspace/php/web/Swoole/Coroutine/ImHttp/Action/Gateway.php on line 80
-[2019-12-06 10:28:59 $312.0]	WARNING	swManager_check_exit_status: worker#0[pid=317] abnormal exit, status=255, signal=0
